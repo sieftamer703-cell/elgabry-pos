@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>مكتبة الجبري — برنامج الكاشير</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4/fonts/remixicon.css">
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+<style>
+:root{--bg:#f7f7f4;--card:#ffffff;--text:#1f2937;--muted:#6b7280;--accent:#1e6f3a;--accent-soft:rgba(30,111,58,.12);--warn:#b45309;--warn-soft:rgba(180,83,9,.12);--danger:#b91c1c;--danger-soft:rgba(185,28,28,.1);--slate:#334155;--border:rgba(31,41,55,.1)}
+*{font-family:Cairo,sans-serif;box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);min-height:100vh}
+.num{font-variant-numeric:tabular-nums}
+.scroll-y::-webkit-scrollbar{width:8px}.scroll-y::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:8px}
+.tab-btn{color:var(--muted);border:1px solid transparent;border-bottom:2px solid transparent;transition:.2s;padding:8px 11px;border-radius:10px 10px 0 0;font-weight:700;font-size:12px;background:transparent;cursor:pointer}
+.tab-btn.active{color:var(--accent);border-bottom:2px solid var(--accent);background:var(--accent-soft)}
+.pcard{transition:transform .15s,border-color .15s;cursor:pointer;border:1px solid var(--border);border-radius:12px;padding:10px;background:var(--bg);text-align:center}
+.pcard:hover{transform:translateY(-2px);border-color:var(--accent)}
+.qtybtn{width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;border:1px solid var(--border);background:var(--card);cursor:pointer;font-weight:700;color:var(--text)}
+.qtybtn:hover{background:var(--accent-soft);border-color:var(--accent)}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
+.btn-primary{background:var(--accent);color:#fff;border:none;border-radius:12px;font-weight:800;cursor:pointer}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.btn-ghost{background:transparent;border:none;cursor:pointer;font-weight:700}
+.btn-warn{background:var(--warn-soft);border:1px solid var(--warn);color:var(--warn);border-radius:8px;cursor:pointer;font-weight:700}
+.btn-ok{background:var(--accent-soft);border:1px solid var(--accent);color:var(--accent);border-radius:8px;cursor:pointer;font-weight:700}
+.btn-slate{background:rgba(51,65,85,.1);border:1px solid var(--slate);color:var(--slate);border-radius:8px;cursor:pointer;font-weight:700}
+.btn-danger{background:var(--danger-soft);border:1px solid var(--danger);color:var(--danger);border-radius:8px;cursor:pointer;font-weight:700}
+.paybtn{flex:1;padding:8px;border:1px solid var(--border);border-radius:10px;background:var(--card);font-weight:700;cursor:pointer;font-size:13px;color:var(--muted)}
+.paybtn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+textarea{resize:vertical;min-height:54px}
+.pur-row{display:flex;gap:6px;align-items:center;margin-bottom:6px;flex-wrap:wrap}
+@media print{
+  body:not(.print-report) *{visibility:hidden}
+  body:not(.print-report) #receiptArea,body:not(.print-report) #receiptArea *{visibility:visible}
+  body:not(.print-report) #receiptArea{position:absolute;top:0;right:0;left:0;margin:0;padding:10px;box-shadow:none;border:none;width:80mm}
+  body.print-report *{visibility:hidden}
+  body.print-report #reportArea,body.print-report #reportArea *{visibility:visible}
+  body.print-report #reportArea{position:absolute;top:0;right:0;left:0;margin:0;padding:15px;box-shadow:none;border:none}
+  body.print-voucher *{visibility:hidden}
+  body.print-voucher #voucherArea,body.print-voucher #voucherArea *{visibility:visible}
+  body.print-voucher #voucherArea{position:absolute;top:0;right:0;left:0;margin:0;padding:15px;box-shadow:none;border:none}
+}
+
+/* Jamica POS premium interface */
+:root{--radius:17px;--shadow:0 12px 35px rgba(15,23,42,.055)}
+body{letter-spacing:.05px}header{backdrop-filter:blur(14px)}
+main{max-width:1440px!important}section>div>div{min-width:0}
+button,input,select,textarea{transition:background .2s,border-color .2s,box-shadow .2s,transform .15s}
+button:not(:disabled):active{transform:scale(.975)}button:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+input,select,textarea{max-width:100%}.pcard{box-shadow:0 3px 12px rgba(15,23,42,.035)}
+.pcard:hover{box-shadow:var(--shadow)}.tab-btn{white-space:nowrap}.tab-btn:hover{background:var(--accent-soft)}
+#upgradeBar{max-width:1440px;margin:16px auto 0;padding:0 20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.up-pill{background:var(--card);border:1px solid var(--border);padding:9px 14px;border-radius:13px;box-shadow:var(--shadow);font-size:12px;font-weight:700}
+.up-pill b{color:var(--accent);font-size:15px}.up-actions{display:flex;gap:7px;flex-wrap:wrap;margin-inline-start:auto}
+.up-action{padding:9px 12px;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:11px;cursor:pointer;font-weight:700;font-size:12px}
+.up-action:hover{border-color:var(--accent);color:var(--accent)}
+#upToast{position:fixed;bottom:24px;left:24px;background:var(--text);color:var(--card);border-radius:12px;padding:12px 18px;z-index:999;box-shadow:var(--shadow);display:none}
+body.up-dark{--bg:#0d1422;--card:#192437;--text:#eef3fb;--muted:#b2bfd2;--border:rgba(221,233,255,.14);--accent-soft:rgba(71,185,111,.19);color-scheme:dark}
+body.up-dark input,body.up-dark textarea,body.up-dark select{background:#243148!important;color:#eef3fb!important;border-color:rgba(221,233,255,.17)!important}
+body.up-dark #receiptArea,body.up-dark #reportArea,body.up-dark #voucherArea{color:#111;background:white}
+@media(max-width:760px){header>div{padding:12px!important}main{padding:12px!important}#upgradeBar{padding:0 12px}.up-actions{margin-inline-start:0}.tab-btn{font-size:11px;padding:8px}#tabs{overflow-x:auto;max-width:100%}#tab-sale>div>div:last-child{position:static!important}#productGrid{max-height:350px!important}}
+@media print{#upgradeBar,#upToast{display:none!important}body.up-dark{color-scheme:light}}
+</style>
+<style id="pro3styles">
+#pro3{max-width:1200px;margin:12px auto;padding:0 20px}#pro3 .panel{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;margin:12px 0}#pro3 .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px}#pro3 .metric{padding:16px;background:var(--bg);border-radius:12px;border:1px solid var(--border)}#pro3 .metric b{display:block;font-size:21px;color:var(--accent);direction:ltr;text-align:right}#pro3 .metric small{color:var(--muted)}#pro3 .controls{display:flex;flex-wrap:wrap;gap:9px;align-items:end}#pro3 label{display:grid;gap:4px;font-size:12px;font-weight:700}#pro3 input,#pro3 select{padding:9px;border:1px solid var(--border);border-radius:9px;max-width:220px;background:var(--card);color:var(--text)}#pro3 button{padding:9px 13px;border-radius:9px;border:1px solid var(--border);background:var(--accent);color:white;cursor:pointer;font-weight:700}#pro3 table{border-collapse:collapse;width:100%;font-size:12px}#pro3 td,#pro3 th{border-bottom:1px solid var(--border);padding:10px;text-align:right}#pro3 .tablewrap{overflow:auto;max-height:350px}#pro3 .muted{color:var(--muted);font-size:12px}#pro3[hidden]{display:none!important}#pro3 .warning{background:var(--warn-soft);border-radius:10px;padding:10px}
+@media print{#pro3{display:none!important}}@media(max-width:650px){#pro3{padding:0 10px}#pro3 .controls>*{max-width:100%}}
+</style></head>
+<body>
+<div style="background:var(--bg);min-height:100vh;position:relative;">
+
+  <header style="border-bottom:1px solid var(--border);background:var(--card);position:sticky;top:0;z-index:20;">
+    <div style="max-width:1200px;margin:0 auto;padding:14px 20px;display:flex;flex-wrap:wrap;align-items:center;gap:14px;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:44px;height:44px;border-radius:12px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;">
+          <i class="ri-store-2-line" style="font-size:24px;color:var(--accent);"></i>
+        </div>
+        <div>
+          <h1 style="margin:0;font-size:20px;font-weight:800;">مكتبة الجبري — الأدوات المكتبية والمدرسية</h1>
+          <p style="margin:0;font-size:12px;color:var(--muted);" id="todayLine">—</p>
+        </div>
+      </div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;" id="tabs">
+        <button id="pro3Tab" class="tab-btn" type="button">📊 الإدارة المتقدمة</button><button data-tab="sale" class="tab-btn active"><i class="ri-shopping-cart-2-line"></i> البيع</button>
+        <button data-tab="products" class="tab-btn"><i class="ri-barcode-line"></i> الأصناف</button>
+        <button data-tab="customers" class="tab-btn"><i class="ri-user-star-line"></i> العملاء</button>
+        <button data-tab="suppliers" class="tab-btn"><i class="ri-truck-line"></i> الموردين</button>
+        <button data-tab="purchases" class="tab-btn"><i class="ri-shopping-basket-2-line"></i> المشتريات</button>
+        <button data-tab="vouchers" class="tab-btn"><i class="ri-file-list-2-line"></i> السندات</button>
+        <button data-tab="history" class="tab-btn"><i class="ri-history-line"></i> التقارير</button>
+      <button id="megaTab" class="tab-btn" type="button">⚙️ الإدارة المتقدمة</button></div>
+    </div>
+  </header>
+
+  <div id="upgradeBar" aria-label="لوحة المتابعة السريعة"><div class="up-pill">الأصناف <b id="upProducts">—</b></div><div class="up-pill">مبيعات اليوم <b id="upToday">—</b></div><div class="up-pill">تنبيه مخزون <b id="upLow">—</b></div><div class="up-actions"><button class="up-action" id="upTheme" type="button">☾ المظهر</button><button class="up-action" id="upCSV" type="button">⇩ تقرير CSV</button><button class="up-action" id="upBackup" type="button">⇩ نسخة كاملة</button><button class="up-action" id="upHelp" type="button">⌨ الاختصارات</button></div></div><div id="upToast" role="status" aria-live="polite"></div>
+<section id="pro3" hidden aria-label="مركز الإدارة الاحترافي">
+<div class="panel"><h2>📊 مركز إدارة مكتبة الجبري</h2><p class="muted">تقارير من البيانات المحفوظة على هذا المتصفح. الأرباح تقديرية حسب أسعار التكلفة المسجلة، ولا تشمل الضرائب أو جميع التكاليف غير المباشرة.</p><div class="controls"><label>من تاريخ<input id="proFrom" type="date"></label><label>إلى تاريخ<input id="proTo" type="date"></label><button id="proRefresh">تحديث التقارير</button><button id="proExport">تصدير تقرير CSV</button><button id="proFullBackup">نسخة احتياطية شاملة</button><button id="proRestore">استعادة نسخة شاملة</button><input type="file" id="proFile" accept="application/json,.json" hidden></div></div>
+<div class="metrics" id="proMetrics"></div>
+<div class="panel"><h3>📦 الجرد وأسعار التكلفة</h3><p class="muted">إضافة سعر تكلفة لكل صنف، وتسجيل فروق الجرد مع الاحتفاظ بسجل للحركات. لا تُعدّل الفواتير القديمة.</p><div class="controls"><label>بحث عن صنف<input id="proSearch" placeholder="اسم الصنف أو الباركود"></label><label>حد تنبيه المخزون<input id="proThreshold" type="number" min="0" value="5"></label><button id="proSearchBtn">عرض الأصناف</button></div><div class="tablewrap"><table><thead><tr><th>الصنف</th><th>المخزون</th><th>سعر البيع</th><th>التكلفة</th><th>الإجراء</th></tr></thead><tbody id="proStock"></tbody></table></div></div>
+<div class="panel"><h3>🧾 المصروفات والمسحوبات</h3><p class="muted">سجلات إضافية مستقلة عن سندات النسخة الأصلية؛ لا تسجل نفس المصروف في المكانين حتى لا يتكرر في التقارير.</p><form id="proExpenseForm" class="controls"><label>النوع<select id="proExpenseType"><option value="expense">مصروف تشغيل</option><option value="withdrawal">مسحوبات شخصية</option><option value="income">إيراد آخر</option></select></label><label>المبلغ<input id="proExpenseAmount" type="number" min="0.01" step="0.01" required></label><label>الوصف<input id="proExpenseNote" required maxlength="150"></label><button type="submit">تسجيل الحركة</button></form><div class="tablewrap"><table><thead><tr><th>التاريخ</th><th>النوع</th><th>المبلغ</th><th>الوصف</th><th></th></tr></thead><tbody id="proExpenses"></tbody></table></div></div>
+<div class="panel"><h3>📋 أحدث حركات الجرد</h3><div class="tablewrap"><table><thead><tr><th>التاريخ</th><th>الصنف</th><th>قبل</th><th>بعد</th><th>السبب</th></tr></thead><tbody id="proMovements"></tbody></table></div><p class="warning muted">البيانات محفوظة محليًا؛ حذف بيانات المتصفح أو فتح الملف من عنوان مختلف قد يؤدي لعدم ظهورها. احتفظ بنسخ احتياطية دورية خارج الجهاز.</p></div></section>
+<main style="max-width:1200px;margin:0 auto;padding:18px 20px 60px;">
+
+    <!-- SALE TAB -->
+    <section id="tab-sale">
+      <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;">
+        <div style="flex:1 1 480px;min-width:280px;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.05);">
+          <div style="position:relative;margin-bottom:12px;">
+            <i class="ri-search-line" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:18px;"></i>
+            <input id="scanInput" type="text" placeholder="امسح الباركود أو اكتب اسم الصنف ثم اضغط Enter" style="width:100%;padding:12px 42px 12px 12px;border:1px solid var(--border);border-radius:10px;font-size:15px;outline:none;background:var(--bg);" autocomplete="off">
+          </div>
+          <div id="productGrid" class="scroll-y" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;max-height:560px;overflow-y:auto;padding-left:4px;"></div>
+        </div>
+
+        <div style="flex:1 1 340px;min-width:280px;background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.05);overflow:hidden;position:sticky;top:80px;">
+          <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:var(--accent-soft);">
+            <strong style="font-size:15px;"><i class="ri-bill-line" style="color:var(--accent);"></i> سلة البيع</strong>
+            <button id="clearCartBtn" class="btn-ghost" style="color:var(--warn);font-size:13px;"><i class="ri-delete-bin-line"></i> إفراغ</button>
+          </div>
+          <div style="padding:10px 16px;border-bottom:1px solid var(--border);background:rgba(51,65,85,.06);">
+            <label style="font-size:12px;color:var(--slate);font-weight:700;display:block;margin-bottom:4px;"><i class="ri-user-line"></i> اسم العميل (إجباري للبيع الآجل)</label>
+            <input id="saleCustomer" list="customerDatalist" type="text" placeholder="اختر عميلاً أو اكتب اسماً" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;outline:none;background:#fff;">
+            <datalist id="customerDatalist"></datalist>
+          </div>
+          <div id="cartList" class="scroll-y" style="max-height:240px;overflow-y:auto;"></div>
+          <div style="padding:14px 16px;border-top:1px solid var(--border);background:var(--bg);">
+            <div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;"><span style="color:var(--muted);">المجموع الفرعي</span><span class="num" id="subTotal">0.00 ج.م</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:14px;margin-bottom:6px;gap:8px;">
+              <span style="color:var(--muted);">خصم %</span>
+              <input id="discInput" type="number" min="0" max="100" value="0" style="width:80px;padding:6px 8px;border:1px solid var(--border);border-radius:8px;text-align:left;font-size:13px;outline:none;">
+              <span class="num" id="discAmount" style="color:var(--warn);font-weight:700;">−0.00</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:baseline;padding:8px 0;border-top:1px dashed var(--border);border-bottom:1px dashed var(--border);margin:6px 0;">
+              <span style="font-weight:800;font-size:16px;">الإجمالي</span>
+              <span class="num" id="grandTotal" style="font-weight:800;font-size:24px;color:var(--accent);">0.00 ج.م</span>
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:8px;">
+              <button class="paybtn active" id="payCash"><i class="ri-hand-coin-line"></i> نقدي</button>
+              <button class="paybtn" id="payCredit"><i class="ri-time-line"></i> آجل (مستحق)</button>
+            </div>
+            <div id="cashRow" style="display:flex;justify-content:space-between;align-items:center;font-size:14px;margin-bottom:6px;gap:8px;">
+              <span style="color:var(--muted);"><i class="ri-cash-line"></i> المدفوع</span>
+              <input id="cashInput" type="number" min="0" placeholder="0" style="flex:1;max-width:160px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;text-align:left;font-size:15px;outline:none;">
+            </div>
+            <div id="creditNote" style="display:none;font-size:12px;color:var(--danger);background:var(--danger-soft);padding:6px 10px;border-radius:8px;margin-bottom:8px;font-weight:700;"><i class="ri-alert-line"></i> سيُضاف الإجمالي لمستحقات العميل</div>
+            <div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:12px;"><span style="color:var(--muted);" id="changeLabel">الباقي / الترجيع</span><span class="num" id="changeAmount" style="font-weight:800;">0.00 ج.م</span></div>
+            <button id="completeBtn" disabled class="btn-primary" style="width:100%;padding:14px;font-size:16px;"><i class="ri-check-double-line"></i> إتمام البيع وطباعة الإيصال</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRODUCTS TAB -->
+    <section id="tab-products" style="display:none;">
+      <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;">
+        <div style="flex:1 1 300px;min-width:280px;background:var(--card);border:1px solid var(--border);border-top:3px solid var(--accent);border-radius:14px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.05);">
+          <h3 style="margin:0 0 12px;font-size:16px;font-weight:800;"><i class="ri-add-circle-line" style="color:var(--accent);"></i> إضافة / تعديل صنف</h3>
+          <form id="prodForm" style="display:flex;flex-direction:column;gap:10px;">
+            <input type="hidden" id="pEditId">
+            <label style="font-size:13px;color:var(--muted);font-weight:700;">اسم الصنف</label>
+            <input id="pName" required type="text" placeholder="مثال: دفتر 100 ورقة" style="padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--bg);">
+            <div style="display:flex;gap:10px;">
+              <div style="flex:1;"><label style="font-size:13px;color:var(--muted);font-weight:700;">سعر البيع (ج.م)</label>
+              <input id="pPrice" required type="number" min="0" step="0.01" placeholder="0.00" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--bg);text-align:left;"></div>
+              <div style="flex:1;"><label style="font-size:13px;color:var(--muted);font-weight:700;">الوحدة</label>
+              <input id="pUnit" type="text" list="unitList" value="قطعة" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--bg);">
+              <datalist id="unitList"><option>قطعة</option><option>علبة</option><option>كرتونة</option><option>دزينة</option><option>رسمة</option><option>كيلو</option><option>متر</option></datalist></div>
+              <div style="flex:1;"><label style="font-size:13px;color:var(--muted);font-weight:700;">المخزون</label>
+              <input id="pStock" type="number" min="0" value="10" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--bg);text-align:left;"></div>
+            </div>
+            <label style="font-size:13px;color:var(--muted);font-weight:700;display:flex;justify-content:space-between;align-items:center;">الباركود (يُولّد تلقائياً)
+              <button type="button" id="genBarcodeBtn" class="btn-warn" style="padding:3px 10px;font-size:12px;"><i class="ri-refresh-line"></i> توليد جديد</button>
+            </label>
+            <input id="pBarcode" required type="text" style="padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--bg);text-align:left;letter-spacing:2px;font-weight:700;">
+            <div style="background:#fff;border:1px dashed var(--border);border-radius:10px;padding:10px;display:flex;justify-content:center;align-items:center;min-height:70px;">
+              <svg id="newBarcode"></svg>
+            </div>
+            <button type="submit" id="saveProdBtn" class="btn-primary" style="padding:12px;font-size:15px;"><i class="ri-save-line"></i> حفظ الصنف</button>
+          </form>
+          <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+            <button id="exportBtn" class="btn-ok" style="padding:7px 12px;font-size:12px;flex:1;"><i class="ri-download-line"></i> نسخ احتياطي</button>
+            <button id="importBtn" class="btn-warn" style="padding:7px 12px;font-size:12px;flex:1;"><i class="ri-upload-line"></i> استعادة نسخة</button>
+            <input type="file" id="importFile" accept=".json" style="display:none;">
+          </div>
+          <div style="margin-top:12px;padding:10px;border:1px dashed var(--border);border-radius:10px;background:var(--bg);">
+            <strong style="font-size:12px;display:block;margin-bottom:6px;"><i class="ri-lock-line" style="color:var(--slate);"></i> كود الحذف الخاص (مطلوب لحذف أي شيء)</strong>
+            <div style="display:flex;gap:6px;">
+              <input id="pinInput" type="password" placeholder="كود جديد" style="flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;outline:none;text-align:left;">
+              <button id="savePinBtn" class="btn-slate" style="padding:7px 12px;font-size:12px;">حفظ الكود</button>
+            </div>
+            <div style="font-size:10px;color:var(--muted);margin-top:4px;">الكود الافتراضي: 1234 — غيّره واحتفظ به.</div>
+          </div>
+          <p style="font-size:11px;color:var(--muted);margin:10px 0 0;line-height:1.6;"><i class="ri-information-line"></i> عدد الأصناف غير محدود، وتُحفظ البيانات على هذا الجهاز.</p>
+        </div>
+        <div style="flex:2 1 480px;min-width:280px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.05);">
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
+            <input id="prodSearch" type="text" placeholder="بحث بالاسم أو الباركود..." style="flex:1;min-width:180px;padding:9px 12px;border:1px solid var(--border);border-radius:10px;font-size:13px;outline:none;background:var(--bg);">
+            <span id="prodCount" style="font-size:12px;color:var(--muted);font-weight:700;"></span>
+          </div>
+          <div id="productList" class="scroll-y" style="max-height:600px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CUSTOMERS TAB -->
+    <section id="tab-customers" style="display:none;">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:14px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;border-right:4px solid var(--danger);">
+        <div><strong style="font-size:14px;"><i class="ri-hand-coin-line" style="color:var(--danger);"></i> إجمالي المستحقات على العملاء</strong></div>
+        <div class="num" id="totalReceivables" style="font-size:22px;font-weight:800;color:var(--danger);">0.00 ج.م</div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;">
+        <div style="flex:1 1 300px;min-width:280px;background:var(--card);border:1px solid var(--border);border-top:3px solid var(--slate);border-radius:14px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.05);">
+          <h3 style="margin:0 0 12px;font-size:16px;font-weight:800;color:var(--slate);"><i class="ri-user-add-line"></i> إضافة / تعديل عميل</h3>
+          <form id="custForm" style="display:flex;flex-direction:column;gap:10px;">
+            <input type="hidden" id="cEditId">
+            <label style="font-size:13px;color:var(--muted);font-weight:700;">اسم العميل *</label>
+            <input id="cName" required type="text" placeholder="اسم العميل أو الشركة" style="padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--bg);">
+            <label style="font-size:13px;color:var(--muted);font-weight:700;">رقم الهاتف</label>
+            <input id="cPhone" type="text" placeholder="01xxxxxxxxx" style="padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--bg);text-align:left;">
+            <label style="font-size:13px;color:var(--muted);font-weight:700;">العنوان</label>
+            <input id="cAddress" type="text" placeholder="العنوان (اختياري)" style="padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--bg);">
+            <label style="font-size:13px;color:var(--muted);font-weight:700;">ملاحظات</label>
+            <textarea id="cNotes" placeholder="ملاحظات عن العميل (اختياري)" style="padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--bg);"></textarea>
+            <button type="submit" id="saveCustBtn" class="btn-slate" style="padding:12px;font-size:15px;border-radius:10px;"><i class="ri-save-line"></i> حفظ العميل</button>
+          </form>
+        </div>
+        <div style="flex:2 1 480px;min-width:280px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.05);">
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
+            <input id="custSearch" type="text" placeholder="بحث عن عميل بالاسم أو الهاتف..." style="flex:1;min-width:180px;padding:9px 12px;border:1px solid var(--border);border-radius:10px;font-size:13px;outline:none;background:var(--bg);">
+            <span id="custCount" style="font-size:12px;color:var(--muted);font-weight:700;"></span>
+          </div>
+          <div id="customerList" class="scroll-y" style="max-height:600px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SUPPLIERS TAB -->
+    <section id="tab-suppliers" style="display:none;">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:14px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;border-right:4px solid var(--warn);">
+        <div><strong style="font-size:14px;"><i class="ri-money-dollar-circle-line" style="color:var(--warn);"></i> إجمالي ما علينا للموردين (آجل)</strong></div>
+        <div class="num" id="totalPayables" style="font-size:22px;font-weight:800;color:var(--warn);">0.00 ج.م</div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;">
+        <div style="flex:1 1 300px;min-width:280px;background:var(--card);border:1px solid var(--border);border-top:3px solid var(--slate);border-radius:14px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.05);">
+          <h3 style="margin:0 0 12px;font-size:16px;font-weight:800;color:var(--slate);"><i class="ri-truck-line"></i> إضافة / تعديل مورد</h3>
+          <form id="suppForm" style="display:flex;flex-direction:column;gap:10px;">
+            <input type="hidden" id="sEditId">
+            <label style="font-size:13px;color:var(--muted);font-weight:700;">اسم المورد / الشركة *</label>
+            <input id="sName" required type="text" placeholder="اسم المورد أو شركة التوريد" style="padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--bg);">
+            <div style="display:flex;gap:10px;">
+              <div style="flex:1;"><label style="font-size:13px;color:var(--muted);font-weight:700;">رقم الهاتف</label>
+              <input id="sPhone" type="text" placeholder="رقم التواصل" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--bg);text-align:left;"></div>
+              <div style="flex:1;"><label style="font-size:13px;color:var(--muted);font-weight:700;">المسؤول</label>
+              <input id="sContact" type="text" placeholder="اسم المسؤول" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--bg);"></div>
+            </div>
+            <label style="font-size:13px;color:var(--muted);font-weight:700;">العنوان</label>
+            <input id="sAddress" type="text" placeholder="العنوان (اختياري)" style="padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--bg);">
+            <label style="font-size:13px;color:var(--muted);font-weight:700;">ملاحظات / الأصناف الموردة</label>
+            <textarea id="sNotes" placeholder="مثال: يورد أقلاماً ودفاتر — آجال دفع 30 يوماً" style="padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--bg);"></textarea>
+            <button type="submit" id="saveSuppBtn" class="btn-slate" style="padding:12px;font-size:15px;border-radius:10px;"><i class="ri-save-line"></i> حفظ المورد</button>
+          </form>
+        </div>
+        <div style="flex:2 1 480px;min-width:280px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.05);">
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
+            <input id="suppSearch" type="text" placeholder="بحث عن مورد بالاسم أو الهاتف..." style="flex:1;min-width:180px;padding:9px 12px;border:1px solid var(--border);border-radius:10px;font-size:13px;outline:none;background:var(--bg);">
+            <span id="suppCount" style="font-size:12px;color:var(--muted);font-weight:700;"></span>
+          </div>
+          <div id="supplierList" class="scroll-y" style="max-height:600px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PURCHASES TAB -->
+    <section id="tab-purchases" style="display:none;">
+      <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;">
+        <div style="flex:1 1 340px;min-width:280px;background:var(--card);border:1px solid var(--border);border-top:3px solid var(--slate);border-radius:14px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.05);">
+          <h3 style="margin:0 0 12px;font-size:16px;font-weight:800;color:var(--slate);"><i class="ri-shopping-basket-2-line"></i> فاتورة شراء من مورد</h3>
+          <label style="font-size:13px;color:var(--muted);font-weight:700;">المورد *</label>
+          <select id="purSupplier" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--bg);margin-bottom:10px;"></select>
+          <label style="font-size:13px;color:var(--muted);font-weight:700;">أصناف الفاتورة (الاسم + الكمية + سعر الشراء)</label>
+          <div id="purRows" style="margin-bottom:8px;"></div>
+          <button id="addPurRow" class="btn-ok" style="padding:7px 12px;font-size:12px;margin-bottom:10px;"><i class="ri-add-line"></i> إضافة صنف للفاتورة</button>
+          <datalist id="productNames"></datalist>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg);border-radius:10px;margin-bottom:10px;">
+            <span style="font-weight:800;font-size:15px;">إجمالي الفاتورة</span>
+            <span class="num" id="purTotal" style="font-weight:800;font-size:20px;color:var(--slate);">0.00 ج.م</span>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:10px;">
+            <button class="paybtn active" id="purPaid"><i class="ri-hand-coin-line"></i> مدفوعة</button>
+            <button class="paybtn" id="purCredit"><i class="ri-time-line"></i> آجلة (له علينا)</button>
+          </div>
+          <button id="savePurBtn" class="btn-slate" style="padding:12px;font-size:15px;border-radius:10px;width:100%;"><i class="ri-save-line"></i> حفظ فاتورة الشراء</button>
+          <p style="font-size:11px;color:var(--muted);margin:10px 0 0;line-height:1.6;"><i class="ri-information-line"></i> عند الحفظ تُضاف الكميات للمخزون تلقائياً، وإذا كانت آجلة تُضاف لمستحقات المورد.</p>
+        </div>
+        <div style="flex:2 1 480px;min-width:280px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.05);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+            <strong style="font-size:15px;"><i class="ri-file-list-3-line"></i> فواتير المشتريات السابقة</strong>
+            <button id="clearPurBtn" class="btn-warn" style="padding:6px 12px;font-size:12px;"><i class="ri-delete-bin-line"></i> مسح السجل</button>
+          </div>
+          <div id="purchaseList" class="scroll-y" style="max-height:600px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HISTORY / REPORTS TAB -->
+    <section id="tab-history" style="display:none;">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:14px;">
+        <strong style="font-size:14px;display:block;margin-bottom:10px;"><i class="ri-printer-line" style="color:var(--accent);"></i> التقارير والطباعة (اختر اليوم أو الشهر)</strong>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+            <label style="font-size:12px;color:var(--muted);font-weight:700;">تقرير يوم:</label>
+            <input id="reportDate" type="date" style="padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;outline:none;">
+            <button id="btnDayReport" class="btn-ok" style="padding:7px 12px;font-size:12px;"><i class="ri-file-text-line"></i> عرض وطباعة</button>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+            <label style="font-size:12px;color:var(--muted);font-weight:700;">تقرير شهر:</label>
+            <input id="reportMonth" type="month" style="padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;outline:none;">
+            <button id="btnMonthReport" class="btn-ok" style="padding:7px 12px;font-size:12px;"><i class="ri-file-text-line"></i> عرض وطباعة</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;margin-top:10px;flex-wrap:wrap;">
+          <label style="font-size:12px;color:var(--muted);font-weight:700;"><i class="ri-calendar-line"></i> الرجوع ليوم سابق لعرض مبيعاته:</label>
+          <input id="histDate" type="date" style="padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;outline:none;">
+          <button id="clearHistDate" class="btn-ghost" style="font-size:12px;color:var(--muted);">عرض الكل</button>
+          <span id="histDayTotal" style="font-size:13px;font-weight:800;color:var(--accent);"></span>
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:14px;">
+        <div style="flex:1 1 150px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;border-top:3px solid var(--accent);">
+          <p style="margin:0;font-size:12px;color:var(--muted);font-weight:700;">مبيعات اليوم</p>
+          <p class="num" id="statToday" style="margin:4px 0 0;font-size:20px;font-weight:800;color:var(--accent);">0.00 ج.م</p>
+        </div>
+        <div style="flex:1 1 150px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;border-top:3px solid var(--slate);">
+          <p style="margin:0;font-size:12px;color:var(--muted);font-weight:700;">عدد الفواتير اليوم</p>
+          <p class="num" id="statCount" style="margin:4px 0 0;font-size:20px;font-weight:800;color:var(--slate);">0</p>
+        </div>
+        <div style="flex:1 1 150px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;border-top:3px solid var(--slate);">
+          <p style="margin:0;font-size:12px;color:var(--muted);font-weight:700;">إجمالي المبيعات</p>
+          <p class="num" id="statAll" style="margin:4px 0 0;font-size:20px;font-weight:800;color:var(--slate);">0.00 ج.م</p>
+        </div>
+        <div style="flex:1 1 150px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;border-top:3px solid var(--danger);">
+          <p style="margin:0;font-size:12px;color:var(--muted);font-weight:700;">مستحقات العملاء</p>
+          <p class="num" id="statRecv" style="margin:4px 0 0;font-size:20px;font-weight:800;color:var(--danger);">0.00 ج.م</p>
+        </div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.05);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+          <strong style="font-size:15px;"><i class="ri-file-list-3-line"></i> فواتير البيع (لكل فاتورة زر مرتجع)</strong>
+          <button id="clearHistoryBtn" class="btn-warn" style="padding:6px 12px;font-size:12px;"><i class="ri-delete-bin-line"></i> مسح السجل</button>
+        </div>
+        <div id="historyList" class="scroll-y" style="max-height:480px;overflow-y:auto;"></div>
+      </div>
+    </section>
+    <!-- VOUCHERS TAB -->
+    <section id="tab-vouchers" style="display:none;">
+      <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;">
+        <div style="flex:1 1 320px;min-width:280px;background:var(--card);border:1px solid var(--border);border-top:3px solid var(--slate);border-radius:14px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.05);">
+          <h3 style="margin:0 0 12px;font-size:16px;font-weight:800;color:var(--slate);"><i class="ri-file-list-2-line"></i> إضافة سند جديد</h3>
+          <form id="vouForm" style="display:flex;flex-direction:column;gap:10px;">
+            <label style="font-size:13px;color:var(--muted);font-weight:700;">نوع السند *</label>
+            <select id="vouType" style="padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--bg);">
+              <option value="receipt">سند قبض (دخل — من عميل)</option>
+              <option value="pay_credit">سند دفع فاتورة آجل (خروج — لمورد)</option>
+              <option value="pay_cash">سند دفع فاتورة كاش (خروج)</option>
+              <option value="advance">سند سلفة (خروج — سلفة لموظف/عميل)</option>
+              <option value="exp_petty">سند مصروفات نثرية (خروج)</option>
+              <option value="exp_general">سند مصروفات عامة (خروج)</option>
+            </select>
+            <label style="font-size:13px;color:var(--muted);font-weight:700;">التاريخ</label>
+            <input id="vouDate" type="date" style="padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--bg);">
+            <div id="vouPartyCustWrap" style="display:none;"><label style="font-size:13px;color:var(--muted);font-weight:700;">العميل (سيُخصم من مستحقاته)</label>
+              <select id="vouCustomer" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--bg);"></select></div>
+            <div id="vouPartySuppWrap" style="display:none;"><label style="font-size:13px;color:var(--muted);font-weight:700;">المورد (سيُخصم مما علينا)</label>
+              <select id="vouSupplier" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--bg);"></select></div>
+            <div id="vouPartyFreeWrap"><label style="font-size:13px;color:var(--muted);font-weight:700;">البيان / المستلم / المستلم منه</label>
+              <input id="vouParty" type="text" placeholder="مثال: محمد أحمد — إيجار المحل" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--bg);"></div>
+            <label style="font-size:13px;color:var(--muted);font-weight:700;">المبلغ (ج.م) *</label>
+            <input id="vouAmount" required type="number" min="0.01" step="0.01" placeholder="0.00" style="padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:16px;font-weight:800;outline:none;background:var(--bg);text-align:left;">
+            <label style="font-size:13px;color:var(--muted);font-weight:700;">ملاحظات</label>
+            <textarea id="vouNotes" placeholder="ملاحظات إضافية على السند" style="padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--bg);"></textarea>
+            <button type="submit" class="btn-slate" style="padding:12px;font-size:15px;border-radius:10px;"><i class="ri-save-line"></i> حفظ السند وطباعته</button>
+          </form>
+        </div>
+        <div style="flex:2 1 480px;min-width:280px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.05);">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+            <div style="flex:1;min-width:120px;background:var(--accent-soft);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--muted);font-weight:700;">إجمالي القبض (داخل)</div><div class="num" id="vouInTotal" style="font-size:18px;font-weight:800;color:var(--accent);">0.00</div></div>
+            <div style="flex:1;min-width:120px;background:var(--danger-soft);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--muted);font-weight:700;">إجمالي الدفع/Mصروف (خارج)</div><div class="num" id="vouOutTotal" style="font-size:18px;font-weight:800;color:var(--danger);">0.00</div></div>
+            <div style="flex:1;min-width:120px;background:rgba(51,65,85,.08);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--muted);font-weight:700;">صافي الحركة</div><div class="num" id="vouNetTotal" style="font-size:18px;font-weight:800;color:var(--slate);">0.00</div></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+            <strong style="font-size:15px;"><i class="ri-file-list-2-line"></i> سجل السندات</strong>
+            <button id="clearVouBtn" class="btn-warn" style="padding:6px 12px;font-size:12px;"><i class="ri-delete-bin-line"></i> مسح السجل</button>
+          </div>
+          <div id="voucherList" class="scroll-y" style="max-height:560px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Receipt modal -->
+  <div id="receiptModal" style="display:none;position:fixed;top:0;right:0;left:0;bottom:0;z-index:50;background:rgba(15,23,42,.45);padding:20px;justify-content:center;overflow-y:auto;">
+    <div id="receiptArea" style="background:#fff;max-width:340px;width:100%;padding:20px;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.2);align-self:flex-start;margin-top:20px;height:fit-content;">
+      <div style="text-align:center;border-bottom:1px dashed #999;padding-bottom:10px;margin-bottom:10px;">
+        <div style="font-size:26px;"><i class="ri-store-2-line" style="color:var(--accent);"></i></div>
+        <div style="font-weight:800;font-size:18px;">مكتبة الجبري</div>
+        <div style="font-size:12px;color:#555;">للأدوات المكتبية والمدرسية</div>
+        <div style="font-size:11px;color:#666;margin-top:4px;" id="rMeta">—</div>
+        <div style="font-size:12px;color:#333;margin-top:4px;" id="rCustomer"></div>
+        <div style="font-size:11px;margin-top:2px;" id="rPayment"></div>
+      </div>
+      <div id="rItems" style="font-size:13px;"></div>
+      <div style="border-top:1px dashed #999;margin-top:10px;padding-top:8px;font-size:13px;">
+        <div style="display:flex;justify-content:space-between;"><span>المجموع</span><span class="num" id="rSub">0.00</span></div>
+        <div style="display:flex;justify-content:space-between;color:var(--warn);"><span>الخصم</span><span class="num" id="rDisc">0.00</span></div>
+        <div style="display:flex;justify-content:space-between;font-weight:800;font-size:15px;margin:4px 0;"><span>الإجمالي</span><span class="num" id="rTotal">0.00</span></div>
+        <div style="display:flex;justify-content:space-between;"><span>المدفوع</span><span class="num" id="rCash">0.00</span></div>
+        <div style="display:flex;justify-content:space-between;font-weight:700;"><span>الترجيع</span><span class="num" id="rChange">0.00</span></div>
+      </div>
+      <div style="text-align:center;font-size:11px;color:#666;margin-top:12px;border-top:1px dashed #999;padding-top:8px;">شكراً لتعاملكم معنا<br>مكتبة الجبري — زورونا مجدداً</div>
+      <div style="display:flex;gap:8px;margin-top:14px;">
+        <button id="printBtn" class="btn-primary" style="flex:1;padding:10px;"><i class="ri-printer-line"></i> طباعة</button>
+        <button id="closeReceiptBtn" style="flex:1;padding:10px;border:1px solid var(--border);border-radius:10px;background:#fff;font-weight:700;cursor:pointer;">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Report modal -->
+  <div id="reportModal" style="display:none;position:fixed;top:0;right:0;left:0;bottom:0;z-index:50;background:rgba(15,23,42,.45);padding:20px;justify-content:center;overflow-y:auto;">
+    <div id="reportArea" style="background:#fff;max-width:520px;width:100%;padding:20px;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.2);align-self:flex-start;margin-top:20px;height:fit-content;">
+      <div style="text-align:center;border-bottom:2px solid var(--accent);padding-bottom:10px;margin-bottom:12px;">
+        <div style="font-weight:800;font-size:18px;">مكتبة الجبري</div>
+        <div style="font-size:12px;color:#555;">تقرير مبيعات — <span id="rPeriod"></span></div>
+        <div style="font-size:11px;color:#888;" id="rPrinted"></div>
+      </div>
+      <div style="display:flex;justify-content:space-around;margin-bottom:12px;text-align:center;flex-wrap:wrap;gap:8px;">
+        <div><div style="font-size:11px;color:var(--muted);">إجمالي المبيعات</div><div class="num" id="rRepTotal" style="font-weight:800;font-size:18px;color:var(--accent);">0</div></div>
+        <div><div style="font-size:11px;color:var(--muted);">عدد الفواتير</div><div class="num" id="rRepCount" style="font-weight:800;font-size:18px;color:var(--slate);">0</div></div>
+        <div><div style="font-size:11px;color:var(--muted);">متوسط الفاتورة</div><div class="num" id="rRepAvg" style="font-weight:800;font-size:18px;color:var(--slate);">0</div></div>
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <thead><tr style="border-bottom:1px solid #ccc;"><th style="text-align:right;padding:6px;">الصنف</th><th style="padding:6px;">الكمية</th><th style="padding:6px;">الإيراد</th></tr></thead>
+        <tbody id="rRepItems"></tbody>
+      </table>
+      <div style="display:flex;gap:8px;margin-top:16px;">
+        <button id="printReportBtn" class="btn-primary" style="flex:1;padding:10px;"><i class="ri-printer-line"></i> طباعة التقرير</button>
+        <button id="closeReportBtn" style="flex:1;padding:10px;border:1px solid var(--border);border-radius:10px;background:#fff;font-weight:700;cursor:pointer;">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Voucher modal -->
+  <div id="voucherModal" style="display:none;position:fixed;top:0;right:0;left:0;bottom:0;z-index:50;background:rgba(15,23,42,.45);padding:20px;justify-content:center;overflow-y:auto;">
+    <div id="voucherArea" style="background:#fff;max-width:420px;width:100%;padding:24px;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.2);align-self:flex-start;margin-top:20px;height:fit-content;">
+      <div style="text-align:center;border-bottom:2px solid var(--accent);padding-bottom:10px;margin-bottom:14px;">
+        <div style="font-weight:800;font-size:18px;">مكتبة الجبري</div>
+        <div style="font-size:12px;color:#555;">للأدوات المكتبية والمدرسية</div>
+        <div id="vTitle" style="font-weight:800;font-size:16px;margin-top:8px;color:var(--slate);">سند</div>
+        <div class="num" style="font-size:11px;color:#888;" id="vMeta">—</div>
+      </div>
+      <div style="font-size:14px;line-height:2.2;">
+        <div style="display:flex;justify-content:space-between;border-bottom:1px dashed #ccc;padding:4px 0;"><span style="color:#555;">التاريخ:</span><span class="num" id="vDate">—</span></div>
+        <div style="display:flex;justify-content:space-between;border-bottom:1px dashed #ccc;padding:4px 0;"><span style="color:#555;" id="vPartyLabel">الطرف:</span><span id="vParty" style="font-weight:700;">—</span></div>
+        <div style="display:flex;justify-content:space-between;border-bottom:1px dashed #ccc;padding:4px 0;"><span style="color:#555;">المبلغ:</span><span class="num" id="vAmount" style="font-weight:800;font-size:18px;color:var(--accent);">0.00 ج.م</span></div>
+        <div style="padding:4px 0;"><span style="color:#555;">البيان:</span><div id="vNotes" style="font-weight:700;white-space:pre-wrap;">—</div></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:30px;font-size:12px;color:#555;text-align:center;">
+        <div style="width:40%;border-top:1px solid #999;padding-top:4px;">المستلم</div>
+        <div style="width:40%;border-top:1px solid #999;padding-top:4px;">المحاسب / الختم</div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:16px;">
+        <button id="printVoucherBtn" class="btn-primary" style="flex:1;padding:10px;"><i class="ri-printer-line"></i> طباعة السند</button>
+        <button id="closeVoucherBtn" style="flex:1;padding:10px;border:1px solid var(--border);border-radius:10px;background:#fff;font-weight:700;cursor:pointer;">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var LS_P='pos_products_v1', LS_S='pos_sales_v1', LS_Q='pos_seq_v1', LS_C='pos_customers_v1', LS_V='pos_suppliers_v1', LS_PAY='pos_payments_v1', LS_PUR='pos_purchases_v1', LS_PIN='pos_pin_v1', LS_VOU='pos_vouchers_v1';
+  var products=[], sales=[], seq=1, cart=[], editingId=null;
+  var customers=[], suppliers=[], payments=[], purchases=[], vouchers=[];
+  var custEditId=null, suppEditId=null, payMode='cash', purMode='paid', pin='1234';
+  var VOU_TYPES={
+    receipt:{label:'سند قبض', dir:'in', party:'customer'},
+    pay_credit:{label:'سند دفع فاتورة آجل', dir:'out', party:'supplier'},
+    pay_cash:{label:'سند دفع فاتورة كاش', dir:'out', party:'free'},
+    advance:{label:'سند سلفة', dir:'out', party:'free'},
+    exp_petty:{label:'سند مصروفات نثرية', dir:'out', party:'free'},
+    exp_general:{label:'سند مصروفات عامة', dir:'out', party:'free'}
+  };
+  var $=function(id){return document.getElementById(id);};
+  var fmt=function(n){return (Number(n)||0).toFixed(2);};
+
+  function seed(){
+    return [
+      {id:1,name:'قلم جل أزرق',price:5,stock:100,barcode:'629000001',unit:'قطعة'},
+      {id:2,name:'قلم جل أحمر',price:5,stock:80,barcode:'629000002',unit:'قطعة'},
+      {id:3,name:'دفتر 100 ورقة',price:25,stock:60,barcode:'629000003',unit:'قطعة'},
+      {id:4,name:'ممحاة',price:3,stock:120,barcode:'629000004',unit:'قطعة'},
+      {id:5,name:'براية',price:4,stock:90,barcode:'629000005',unit:'قطعة'},
+      {id:6,name:'مسطرة 30 سم',price:8,stock:70,barcode:'629000006',unit:'قطعة'},
+      {id:7,name:'كراسة خط',price:15,stock:50,barcode:'629000007',unit:'قطعة'},
+      {id:8,name:'قصاصة',price:20,stock:30,barcode:'629000008',unit:'قطعة'},
+      {id:9,name:'لاصق شفاف',price:12,stock:45,barcode:'629000009',unit:'قطعة'},
+      {id:10,name:'أقلام تلوين 12 لون',price:45,stock:25,barcode:'629000010',unit:'علبة'},
+      {id:11,name:'ملف بلاستيك',price:10,stock:55,barcode:'629000011',unit:'قطعة'},
+      {id:12,name:'غلاف كتاب',price:6,stock:200,barcode:'629000012',unit:'قطعة'}
+    ];
+  }
+  function load(){
+    try{products=JSON.parse(localStorage.getItem(LS_P));}catch(e){}
+    if(!Array.isArray(products)){products=seed();}
+    try{sales=JSON.parse(localStorage.getItem(LS_S))||[];}catch(e){sales=[];}
+    try{customers=JSON.parse(localStorage.getItem(LS_C))||[];}catch(e){customers=[];}
+    try{suppliers=JSON.parse(localStorage.getItem(LS_V))||[];}catch(e){suppliers=[];}
+    try{payments=JSON.parse(localStorage.getItem(LS_PAY))||[];}catch(e){payments=[];}
+    try{purchases=JSON.parse(localStorage.getItem(LS_PUR))||[];}catch(e){purchases=[];}
+    try{vouchers=JSON.parse(localStorage.getItem(LS_VOU))||[];}catch(e){vouchers=[];}
+    seq=parseInt(localStorage.getItem(LS_Q)||'13',10)||13;
+    try{pin=localStorage.getItem(LS_PIN)||'1234';}catch(e){}
+    customers.forEach(function(c){if(typeof c.balance==='undefined')c.balance=0;});
+    suppliers.forEach(function(s){if(typeof s.balance==='undefined')s.balance=0;});
+    products.forEach(function(p){if(!p.unit)p.unit='قطعة';});
+  }
+  function saveP(){localStorage.setItem(LS_P,JSON.stringify(products));}
+  function saveS(){localStorage.setItem(LS_S,JSON.stringify(sales));}
+  function saveQ(){localStorage.setItem(LS_Q,String(seq));}
+  function saveC(){localStorage.setItem(LS_C,JSON.stringify(customers));}
+  function saveV(){localStorage.setItem(LS_V,JSON.stringify(suppliers));}
+  function savePay(){localStorage.setItem(LS_PAY,JSON.stringify(payments));}
+  function savePur(){localStorage.setItem(LS_PUR,JSON.stringify(purchases));}
+  function saveVou(){localStorage.setItem(LS_VOU,JSON.stringify(vouchers));}
+
+  function genBarcode(){var code='629'+('000000'+seq).slice(-6);seq++;saveQ();return code;}
+  function drawBarcode(el,code){
+    if(!el)return;
+    if(typeof JsBarcode==='undefined'){setTimeout(function(){drawBarcode(el,code);},200);return;}
+    try{JsBarcode(el,code,{format:'CODE128',width:1.6,height:44,displayValue:true,fontSize:12,margin:2});}catch(e){}
+  }
+  function refreshCustomerDatalist(){
+    var dl=$('customerDatalist');dl.innerHTML='';
+    customers.forEach(function(c){var o=document.createElement('option');o.value=c.name;dl.appendChild(o);});
+  }
+  function refreshSupplierSelect(){
+    var sel=$('purSupplier');sel.innerHTML='';
+    suppliers.forEach(function(s){var o=document.createElement('option');o.value=s.id;o.textContent=s.name;sel.appendChild(o);});
+    if(!suppliers.length){var o=document.createElement('option');o.value='';o.textContent='أضف مورد أولاً من تبويب الموردين';sel.appendChild(o);}
+  }
+  function refreshProductNames(){
+    var dl=$('productNames');dl.innerHTML='';
+    products.forEach(function(p){var o=document.createElement('option');o.value=p.name;dl.appendChild(o);});
+  }
+  function totalReceivables(){var t=0;customers.forEach(function(c){t+=(c.balance||0);});return t;}
+  function totalPayables(){var t=0;suppliers.forEach(function(s){t+=(s.balance||0);});return t;}
+  function validSales(){return sales.filter(function(s){return !s.returned;});}
+  function confirmPin(){
+    var v=prompt('هذا الإجراء محمي — أدخل كود الحذف الخاص:');
+    if(v===null)return false;
+    if(v===pin)return true;
+    alert('كود خاطئ — تم إلغاء الإجراء');
+    return false;
+  }
+
+  var tabs=document.querySelectorAll('#tabs .tab-btn');
+  tabs.forEach(function(b){b.addEventListener('click',function(){
+    tabs.forEach(function(t){t.classList.remove('active');});
+    b.classList.add('active');
+    var t=b.getAttribute('data-tab');
+    ['sale','products','customers','suppliers','purchases','vouchers','history'].forEach(function(k){
+      $('tab-'+k).style.display=(t===k)?'':'none';
+    });
+    if(t==='products'){renderProductList();if(!editingId){$('pBarcode').value=genBarcode();drawBarcode($('newBarcode'),$('pBarcode').value);}}
+    if(t==='customers'){renderCustomers();}
+    if(t==='suppliers'){renderSuppliers();}
+    if(t==='purchases'){refreshSupplierSelect();refreshProductNames();renderPurchases();}
+    if(t==='vouchers'){refreshVoucherParties();renderVouchers();}
+    if(t==='history'){renderHistory();}
+    if(t==='sale'){$('scanInput').focus();}
+  });});
+
+  function renderGrid(filter){
+    filter=(filter||'').trim().toLowerCase();
+    var g=$('productGrid');g.innerHTML='';
+    var list=products.filter(function(p){return !filter||p.name.toLowerCase().indexOf(filter)>-1||String(p.barcode).indexOf(filter)>-1;});
+    if(!list.length){g.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:30px;font-size:14px;">لا توجد أصناف مطابقة</div>';return;}
+    list.forEach(function(p){
+      var low=p.stock<=5;
+      var d=document.createElement('div');
+      d.className='pcard';
+      d.innerHTML='<div style="font-weight:700;font-size:13px;min-height:38px;display:flex;align-items:center;justify-content:center;line-height:1.3;">'+p.name+'</div>'
+        +'<div class="num" style="color:var(--accent);font-weight:800;font-size:15px;margin:4px 0;">'+fmt(p.price)+' ج.م</div>'
+        +'<div style="font-size:10px;color:var(--muted);">الوحدة: '+p.unit+'</div>'
+        +'<div style="font-size:11px;color:'+(low?'var(--warn)':'var(--muted)')+';font-weight:700;">'+(low?'مخزون منخفض: ':'المخزون: ')+p.stock+'</div>';
+      d.addEventListener('click',function(){addToCart(p.id);});
+      g.appendChild(d);
+    });
+  }
+  $('scanInput').addEventListener('input',function(){renderGrid(this.value);});
+  $('scanInput').addEventListener('keydown',function(e){
+    if(e.key==='Enter'){
+      var v=this.value.trim();if(!v)return;
+      var found=products.find(function(p){return String(p.barcode)===v;})||products.find(function(p){return p.name.toLowerCase().indexOf(v.toLowerCase())>-1;});
+      if(found){addToCart(found.id);this.value='';renderGrid('');}
+      this.focus();
+    }
+  });
+
+  function addToCart(pid){
+    var p=products.find(function(x){return x.id===pid;});if(!p)return;
+    var it=cart.find(function(x){return x.id===pid;});
+    if(it){if(it.qty<p.stock){it.qty++;}else{alert('الكمية تتجاوز المخزون ('+p.stock+')');return;}}
+    else{if(p.stock<=0){alert('الصنف غير متوفر بالمخزون');return;}cart.push({id:p.id,name:p.name,price:p.price,unit:p.unit,qty:1});}
+    renderCart();
+  }
+  function renderCart(){
+    var c=$('cartList');c.innerHTML='';
+    if(!cart.length){c.innerHTML='<div style="text-align:center;color:var(--muted);padding:30px;font-size:14px;"><i class="ri-shopping-cart-line" style="font-size:30px;display:block;margin-bottom:6px;"></i>السلة فارغة</div>';}
+    cart.forEach(function(it,i){
+      var row=document.createElement('div');
+      row.style.cssText='display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border);';
+      row.innerHTML='<div style="flex:1;min-width:80px;"><div style="font-weight:700;font-size:13px;">'+it.name+'</div><div class="num" style="font-size:12px;color:var(--muted);">'+fmt(it.price)+' × '+it.qty+' '+it.unit+'</div></div>'
+        +'<button class="qtybtn" data-act="minus" data-i="'+i+'">−</button>'
+        +'<span class="num" style="font-weight:800;min-width:22px;text-align:center;">'+it.qty+'</span>'
+        +'<button class="qtybtn" data-act="plus" data-i="'+i+'">+</button>'
+        +'<span class="num" style="font-weight:800;color:var(--accent);min-width:70px;text-align:left;">'+fmt(it.price*it.qty)+'</span>'
+        +'<button data-act="del" data-i="'+i+'" style="background:none;border:none;color:var(--warn);cursor:pointer;font-size:16px;padding:4px;"><i class="ri-close-circle-line"></i></button>';
+      c.appendChild(row);
+    });
+    c.querySelectorAll('button').forEach(function(b){b.addEventListener('click',function(){
+      var i=+b.getAttribute('data-i'),act=b.getAttribute('data-act');
+      if(act==='plus'){var p=products.find(function(x){return x.id===cart[i].id;});if(cart[i].qty<p.stock)cart[i].qty++;}
+      else if(act==='minus'){cart[i].qty--;if(cart[i].qty<=0)cart.splice(i,1);}
+      else{cart.splice(i,1);}
+      renderCart();
+    });});
+    updateTotals();
+  }
+  function totals(){
+    var sub=0;cart.forEach(function(it){sub+=it.price*it.qty;});
+    var disc=Math.min(100,Math.max(0,parseFloat($('discInput').value)||0));
+    var da=sub*disc/100;
+    return {sub:sub,disc:da,total:sub-da};
+  }
+  function updateTotals(){
+    var t=totals();
+    $('subTotal').textContent=fmt(t.sub)+' ج.م';
+    $('discAmount').textContent='−'+fmt(t.disc);
+    $('grandTotal').textContent=fmt(t.total)+' ج.م';
+    var cash=parseFloat($('cashInput').value)||0;
+    var ch=payMode==='credit'?0:(cash-t.total);
+    $('changeAmount').textContent=fmt(ch)+' ج.م';
+    $('changeAmount').style.color=ch<0?'var(--danger)':'var(--accent)';
+    var ok;
+    if(payMode==='credit'){ok=cart.length>0 && t.total>0 && $('saleCustomer').value.trim().length>0;}
+    else{ok=cart.length>0 && cash>=t.total && t.total>0;}
+    $('completeBtn').disabled=!ok;
+  }
+  $('discInput').addEventListener('input',updateTotals);
+  $('cashInput').addEventListener('input',updateTotals);
+  $('saleCustomer').addEventListener('input',updateTotals);
+  $('clearCartBtn').addEventListener('click',function(){cart=[];$('cashInput').value='';$('discInput').value=0;$('saleCustomer').value='';renderCart();});
+
+  function setPayMode(m){
+    payMode=m;
+    $('payCash').classList.toggle('active',m==='cash');
+    $('payCredit').classList.toggle('active',m==='credit');
+    $('cashRow').style.display=m==='cash'?'flex':'none';
+    $('creditNote').style.display=m==='credit'?'block':'none';
+    $('changeLabel').textContent=m==='credit'?'المستحق على العميل':'الباقي / الترجيع';
+    if(m==='credit'){$('changeAmount').textContent=fmt(totals().total)+' ج.م';$('changeAmount').style.color='var(--danger)';}
+    updateTotals();
+  }
+  $('payCash').addEventListener('click',function(){setPayMode('cash');});
+  $('payCredit').addEventListener('click',function(){setPayMode('credit');});
+
+  $('completeBtn').addEventListener('click',function(){
+    if(this.disabled)return;
+    if(cart.some(function(it){var p=products.find(function(x){return x.id===it.id;});return !p||p.stock<it.qty;})){alert('المخزون غير كافٍ لأحد الأصناف. راجع السلة.');return;}
+    this.disabled=true;
+    var t=totals();var cash=payMode==='credit'?0:(parseFloat($('cashInput').value)||0);
+    var cust=$('saleCustomer').value.trim()||'عميل نقدي';
+    var items=cart.map(function(it){return {name:it.name,price:it.price,unit:it.unit,qty:it.qty};});
+    cart.forEach(function(it){var p=products.find(function(x){return x.id===it.id;});if(p){p.stock=Math.max(0,p.stock-it.qty);}});
+    saveP();
+    if(payMode==='credit'){
+      var c=customers.find(function(x){return x.name===cust;});
+      if(c){c.balance=(c.balance||0)+t.total;saveC();}
+      else{var maxId=0;customers.forEach(function(x){if(x.id>maxId)maxId=x.id;});
+        customers.push({id:maxId+1,code:'C-'+('0000'+(maxId+1)).slice(-4),name:cust,phone:'',address:'',notes:'',balance:t.total});saveC();refreshCustomerDatalist();}
+    }
+    var sale={id:Date.now(),date:new Date().toISOString(),customer:cust,paymentType:payMode,items:items,sub:t.sub,disc:t.disc,total:t.total,cash:cash,change:payMode==='credit'?0:(cash-t.total),returned:false};
+    sales.unshift(sale);saveS();
+    window.dispatchEvent(new Event('jamica:sale'));
+    showReceipt(sale);
+    cart=[];$('cashInput').value='';$('discInput').value=0;$('saleCustomer').value='';setPayMode('cash');renderCart();renderGrid($('scanInput').value);window.dispatchEvent(new Event('jamica:sale'));
+  });
+  function showReceipt(s){
+    $('rMeta').textContent='فاتورة رقم: '+s.id+'  |  '+new Date(s.date).toLocaleString('ar-EG');
+    $('rCustomer').textContent=(s.customer&&s.customer!=='عميل نقدي')?('العميل: '+s.customer):'';
+    $('rPayment').innerHTML=s.paymentType==='credit'?'<span style="color:var(--danger);font-weight:700;">طريقة الدفع: آجل — مستحق على العميل</span>':'<span style="color:var(--accent);font-weight:700;">طريقة الدفع: نقدي</span>';
+    var html='';
+    s.items.forEach(function(it){html+='<div style="display:flex;justify-content:space-between;line-height:1.8;"><span>'+it.name+' ('+it.qty+' '+(it.unit||'قطعة')+')</span><span class="num">'+fmt(it.price*it.qty)+'</span></div>';});
+    $('rItems').innerHTML=html;
+    $('rSub').textContent=fmt(s.sub);$('rDisc').textContent='−'+fmt(s.disc);
+    $('rTotal').textContent=fmt(s.total);$('rCash').textContent=fmt(s.cash);$('rChange').textContent=fmt(s.change);
+    $('receiptModal').style.display='flex';
+  }
+  $('closeReceiptBtn').addEventListener('click',function(){$('receiptModal').style.display='none';});
+  $('printBtn').addEventListener('click',function(){window.print();});
+
+  function fillNewBarcode(){$('pBarcode').value=genBarcode();drawBarcode($('newBarcode'),$('pBarcode').value);}
+  $('genBarcodeBtn').addEventListener('click',fillNewBarcode);
+  $('pBarcode').addEventListener('input',function(){drawBarcode($('newBarcode'),this.value||'000000');});
+  $('prodForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    var name=$('pName').value.trim(), price=parseFloat($('pPrice').value), stock=parseInt($('pStock').value)||0, barcode=$('pBarcode').value.trim(), unit=$('pUnit').value.trim()||'قطعة';
+    if(!name||!(price>=0)||!barcode){alert('يرجى إكمال البيانات');return;}
+    if(products.find(function(p){return String(p.barcode)===barcode && p.id!==editingId;})){alert('هذا الباركود مستخدم بالفعل');return;}
+    if(editingId){var p=products.find(function(x){return x.id===editingId;});if(p){p.name=name;p.price=price;p.stock=stock;p.barcode=barcode;p.unit=unit;}editingId=null;$('saveProdBtn').innerHTML='<i class="ri-save-line"></i> حفظ الصنف';}
+    else{var maxId=0;products.forEach(function(x){if(x.id>maxId)maxId=x.id;});products.push({id:maxId+1,name:name,price:price,stock:stock,barcode:barcode,unit:unit});}
+    saveP();this.reset();$('pStock').value=10;$('pUnit').value='قطعة';fillNewBarcode();renderProductList();renderGrid($('scanInput').value);refreshProductNames();
+  });
+  function renderProductList(){
+    var f=($('prodSearch').value||'').trim().toLowerCase();
+    var box=$('productList');box.innerHTML='';
+    var list=products.filter(function(p){return !f||p.name.toLowerCase().indexOf(f)>-1||String(p.barcode).indexOf(f)>-1;});
+    $('prodCount').textContent=list.length+' صنف';
+    if(!list.length){box.innerHTML='<div style="text-align:center;color:var(--muted);padding:30px;">لا توجد أصناف</div>';return;}
+    list.forEach(function(p){
+      var low=p.stock<=5;
+      var row=document.createElement('div');
+      row.style.cssText='display:flex;align-items:center;gap:12px;border:1px solid var(--border);border-radius:12px;padding:10px 12px;background:var(--bg);flex-wrap:wrap;';
+      row.innerHTML='<svg class="bcsvg" data-code="'+p.barcode+'" style="background:#fff;padding:4px 8px;border-radius:8px;flex-shrink:0;"></svg>'
+        +'<div style="flex:1;min-width:140px;"><div style="font-weight:700;font-size:14px;">'+p.name+' <span style="font-size:11px;color:var(--muted);">('+p.unit+')</span></div>'
+        +'<div class="num" style="font-size:12px;color:var(--muted);">السعر: <span style="color:var(--accent);font-weight:700;">'+fmt(p.price)+' ج.م</span> | المخزون: <span style="color:'+(low?'var(--warn)':'var(--muted)')+';font-weight:700;">'+p.stock+'</span> | كود: '+p.barcode+'</div></div>'
+        +'<div style="display:flex;gap:6px;"><button data-edit="'+p.id+'" class="btn-ok" style="padding:6px 10px;font-size:12px;"><i class="ri-edit-line"></i> تعديل</button>'
+        +'<button data-del="'+p.id+'" class="btn-warn" style="padding:6px 10px;font-size:12px;"><i class="ri-delete-bin-line"></i> حذف</button></div>';
+      box.appendChild(row);
+    });
+    box.querySelectorAll('.bcsvg').forEach(function(el){drawBarcode(el,el.getAttribute('data-code'));});
+    box.querySelectorAll('[data-edit]').forEach(function(b){b.addEventListener('click',function(){
+      var p=products.find(function(x){return x.id===+b.getAttribute('data-edit');});if(!p)return;
+      editingId=p.id;$('pName').value=p.name;$('pPrice').value=p.price;$('pStock').value=p.stock;$('pUnit').value=p.unit||'قطعة';$('pBarcode').value=p.barcode;
+      drawBarcode($('newBarcode'),p.barcode);$('saveProdBtn').innerHTML='<i class="ri-save-line"></i> حفظ التعديل';
+      window.scrollTo({top:0,behavior:'smooth'});
+    });});
+    box.querySelectorAll('[data-del]').forEach(function(b){b.addEventListener('click',function(){
+      if(confirmPin()&&confirm('تأكيد حذف الصنف؟')){products=products.filter(function(x){return x.id!==+b.getAttribute('data-del');});saveP();renderProductList();renderGrid($('scanInput').value);refreshProductNames();}
+    });});
+  }
+  $('prodSearch').addEventListener('input',renderProductList);
+
+  $('custForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    var name=$('cName').value.trim(), phone=$('cPhone').value.trim(), address=$('cAddress').value.trim(), notes=$('cNotes').value.trim();
+    if(!name){alert('يرجى إدخال اسم العميل');return;}
+    if(custEditId){var c=customers.find(function(x){return x.id===custEditId;});if(c){c.name=name;c.phone=phone;c.address=address;c.notes=notes;}custEditId=null;$('saveCustBtn').innerHTML='<i class="ri-save-line"></i> حفظ العميل';}
+    else{var maxId=0;customers.forEach(function(x){if(x.id>maxId)maxId=x.id;});customers.push({id:maxId+1,code:'C-'+('0000'+(maxId+1)).slice(-4),name:name,phone:phone,address:address,notes:notes,balance:0});}
+    saveC();refreshCustomerDatalist();this.reset();renderCustomers();
+  });
+  function renderCustomers(){
+    var f=($('custSearch').value||'').trim().toLowerCase();
+    var box=$('customerList');box.innerHTML='';
+    var list=customers.filter(function(c){return !f||c.name.toLowerCase().indexOf(f)>-1||(c.phone||'').indexOf(f)>-1;});
+    $('custCount').textContent=list.length+' عميل';
+    $('totalReceivables').textContent=fmt(totalReceivables())+' ج.م';
+    if(!list.length){box.innerHTML='<div style="text-align:center;color:var(--muted);padding:30px;"><i class="ri-user-line" style="font-size:30px;display:block;margin-bottom:6px;"></i>لا يوجد عملاء مسجلون بعد</div>';return;}
+    list.forEach(function(c){
+      var bal=c.balance||0;
+      var row=document.createElement('div');
+      row.style.cssText='border:1px solid var(--border);border-radius:12px;padding:10px 14px;background:var(--bg);display:flex;gap:12px;align-items:center;flex-wrap:wrap;';
+      row.innerHTML='<div style="width:40px;height:40px;border-radius:50%;background:rgba(51,65,85,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="ri-user-line" style="color:var(--slate);font-size:18px;"></i></div>'
+        +'<div style="flex:1;min-width:160px;"><div style="font-weight:700;font-size:14px;">'+c.name+' <span class="num" style="font-size:11px;color:var(--muted);font-weight:600;">['+c.code+']</span></div>'
+        +'<div class="num" style="font-size:12px;color:var(--muted);">'+(c.phone?'<i class="ri-phone-line"></i> '+c.phone+'  ':'')+(c.address?'<i class="ri-map-pin-line"></i> '+c.address:'')+'</div>'
+        +'<div style="margin-top:3px;">'+(bal>0?'<span style="font-size:12px;font-weight:800;color:var(--danger);background:var(--danger-soft);padding:2px 8px;border-radius:20px;">مستحق عليه: '+fmt(bal)+' ج.م</span>':'<span style="font-size:12px;font-weight:700;color:var(--accent);">حساب مستقر</span>')+'</div>'
+        +(c.notes?'<div style="font-size:11px;color:var(--muted);margin-top:2px;">'+c.notes+'</div>':'')+'</div>'
+        +'<div style="display:flex;gap:6px;flex-wrap:wrap;">'
+        +(bal>0?'<button data-cpay="'+c.id+'" class="btn-danger" style="padding:6px 10px;font-size:12px;"><i class="ri-hand-coin-line"></i> تسديد</button>':'')
+        +'<button data-cedit="'+c.id+'" class="btn-slate" style="padding:6px 10px;font-size:12px;"><i class="ri-edit-line"></i> تعديل</button>'
+        +'<button data-cdel="'+c.id+'" class="btn-warn" style="padding:6px 10px;font-size:12px;"><i class="ri-delete-bin-line"></i> حذف</button></div>';
+      box.appendChild(row);
+    });
+    box.querySelectorAll('[data-cpay]').forEach(function(b){b.addEventListener('click',function(){
+      var c=customers.find(function(x){return x.id===+b.getAttribute('data-cpay');});if(!c)return;
+      var amt=prompt('تسديد دفعة من العميل '+c.name+'\nالمستحق حالياً: '+fmt(c.balance)+' ج.م\nأدخل المبلغ المسدد:');
+      if(amt===null)return;amt=parseFloat(amt);if(!(amt>0)){alert('مبلغ غير صالح');return;}
+      if(amt>c.balance){alert('المبلغ أكبر من المستحق');return;}
+      c.balance=Math.max(0,c.balance-amt);
+      payments.push({id:Date.now(),date:new Date().toISOString(),customerId:c.id,customerName:c.name,amount:amt});
+      saveC();savePay();renderCustomers();alert('تم تسديد '+fmt(amt)+' ج.م — الباقي: '+fmt(c.balance)+' ج.م');
+    });});
+    box.querySelectorAll('[data-cedit]').forEach(function(b){b.addEventListener('click',function(){
+      var c=customers.find(function(x){return x.id===+b.getAttribute('data-cedit');});if(!c)return;
+      custEditId=c.id;$('cName').value=c.name;$('cPhone').value=c.phone||'';$('cAddress').value=c.address||'';$('cNotes').value=c.notes||'';
+      $('saveCustBtn').innerHTML='<i class="ri-save-line"></i> حفظ التعديل';window.scrollTo({top:0,behavior:'smooth'});
+    });});
+    box.querySelectorAll('[data-cdel]').forEach(function(b){b.addEventListener('click',function(){
+      if(confirmPin()&&confirm('تأكيد حذف العميل؟')){customers=customers.filter(function(x){return x.id!==+b.getAttribute('data-cdel');});saveC();refreshCustomerDatalist();renderCustomers();}
+    });});
+  }
+  $('custSearch').addEventListener('input',renderCustomers);
+
+  $('suppForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    var name=$('sName').value.trim(), phone=$('sPhone').value.trim(), contact=$('sContact').value.trim(), address=$('sAddress').value.trim(), notes=$('sNotes').value.trim();
+    if(!name){alert('يرجى إدخال اسم المورد');return;}
+    var sid=window.__suppEditId||null;
+    if(sid){var s=suppliers.find(function(x){return x.id===sid;});if(s){s.name=name;s.phone=phone;s.contact=contact;s.address=address;s.notes=notes;}window.__suppEditId=null;$('saveSuppBtn').innerHTML='<i class="ri-save-line"></i> حفظ المورد';}
+    else{var maxId=0;suppliers.forEach(function(x){if(x.id>maxId)maxId=x.id;});suppliers.push({id:maxId+1,code:'S-'+('0000'+(maxId+1)).slice(-4),name:name,phone:phone,contact:contact,address:address,notes:notes,balance:0});}
+    saveV();refreshSupplierSelect();this.reset();renderSuppliers();
+  });
+  function renderSuppliers(){
+    var f=($('suppSearch').value||'').trim().toLowerCase();
+    var box=$('supplierList');box.innerHTML='';
+    var list=suppliers.filter(function(s){return !f||s.name.toLowerCase().indexOf(f)>-1||(s.phone||'').indexOf(f)>-1;});
+    $('suppCount').textContent=list.length+' مورد';
+    $('totalPayables').textContent=fmt(totalPayables())+' ج.م';
+    if(!list.length){box.innerHTML='<div style="text-align:center;color:var(--muted);padding:30px;"><i class="ri-truck-line" style="font-size:30px;display:block;margin-bottom:6px;"></i>لا يوجد موردون مسجلون بعد</div>';return;}
+    list.forEach(function(s){
+      var bal=s.balance||0;
+      var row=document.createElement('div');
+      row.style.cssText='border:1px solid var(--border);border-radius:12px;padding:10px 14px;background:var(--bg);display:flex;gap:12px;align-items:center;flex-wrap:wrap;';
+      row.innerHTML='<div style="width:40px;height:40px;border-radius:50%;background:rgba(51,65,85,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="ri-truck-line" style="color:var(--slate);font-size:18px;"></i></div>'
+        +'<div style="flex:1;min-width:160px;"><div style="font-weight:700;font-size:14px;">'+s.name+' <span class="num" style="font-size:11px;color:var(--muted);font-weight:600;">['+s.code+']</span></div>'
+        +'<div class="num" style="font-size:12px;color:var(--muted);">'+(s.phone?'<i class="ri-phone-line"></i> '+s.phone+'  ':'')+(s.contact?'<i class="ri-user-line"></i> '+s.contact+'  ':'')+(s.address?'<i class="ri-map-pin-line"></i> '+s.address:'')+'</div>'
+        +'<div style="margin-top:3px;">'+(bal>0?'<span style="font-size:12px;font-weight:800;color:var(--warn);background:var(--warn-soft);padding:2px 8px;border-radius:20px;">له علينا: '+fmt(bal)+' ج.م</span>':'<span style="font-size:12px;font-weight:700;color:var(--accent);">حساب مستقر</span>')+'</div>'
+        +(s.notes?'<div style="font-size:11px;color:var(--muted);margin-top:2px;">'+s.notes+'</div>':'')+'</div>'
+        +'<div style="display:flex;gap:6px;flex-wrap:wrap;">'
+        +(bal>0?'<button data-spay="'+s.id+'" class="btn-warn" style="padding:6px 10px;font-size:12px;"><i class="ri-hand-coin-line"></i> تسديد له</button>':'')
+        +'<button data-sedit="'+s.id+'" class="btn-ok" style="padding:6px 10px;font-size:12px;"><i class="ri-edit-line"></i> تعديل</button>'
+        +'<button data-sdel="'+s.id+'" class="btn-warn" style="padding:6px 10px;font-size:12px;"><i class="ri-delete-bin-line"></i> حذف</button></div>';
+      box.appendChild(row);
+    });
+    box.querySelectorAll('[data-spay]').forEach(function(b){b.addEventListener('click',function(){
+      var s=suppliers.find(function(x){return x.id===+b.getAttribute('data-spay');});if(!s)return;
+      var amt=prompt('تسديد دفعة للمورد '+s.name+'\nما علينا حالياً: '+fmt(s.balance)+' ج.م\nأدخل المبلغ المسدد:');
+      if(amt===null)return;amt=parseFloat(amt);if(!(amt>0)){alert('مبلغ غير صالح');return;}
+      if(amt>s.balance){alert('المبلغ أكبر من المستحق');return;}
+      s.balance=Math.max(0,s.balance-amt);saveV();renderSuppliers();alert('تم تسديد '+fmt(amt)+' ج.م — الباقي له: '+fmt(s.balance)+' ج.م');
+    });});
+    box.querySelectorAll('[data-sedit]').forEach(function(b){b.addEventListener('click',function(){
+      var s=suppliers.find(function(x){return x.id===+b.getAttribute('data-sedit');});if(!s)return;
+      window.__suppEditId=s.id;$('sName').value=s.name;$('sPhone').value=s.phone||'';$('sContact').value=s.contact||'';$('sAddress').value=s.address||'';$('sNotes').value=s.notes||'';
+      $('saveSuppBtn').innerHTML='<i class="ri-save-line"></i> حفظ التعديل';window.scrollTo({top:0,behavior:'smooth'});
+    });});
+    box.querySelectorAll('[data-sdel]').forEach(function(b){b.addEventListener('click',function(){
+      if(confirmPin()&&confirm('تأكيد حذف المورد؟')){suppliers=suppliers.filter(function(x){return x.id!==+b.getAttribute('data-sdel');});saveV();refreshSupplierSelect();renderSuppliers();}
+    });});
+  }
+  $('suppSearch').addEventListener('input',renderSuppliers);
+
+  function addPurRow(){
+    var box=$('purRows');
+    var row=document.createElement('div');
+    row.className='pur-row';
+    row.innerHTML='<input class="pur-name" list="productNames" type="text" placeholder="اسم الصنف" style="flex:1;min-width:120px;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:13px;outline:none;background:#fff;">'
+      +'<input class="pur-qty" type="number" min="0" placeholder="الكمية" style="width:80px;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:13px;outline:none;background:#fff;text-align:left;">'
+      +'<input class="pur-cost" type="number" min="0" step="0.01" placeholder="سعر الشراء" style="width:100px;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:13px;outline:none;background:#fff;text-align:left;">'
+      +'<button class="pur-del btn-warn" style="padding:6px 9px;font-size:12px;"><i class="ri-close-line"></i></button>';
+    box.appendChild(row);
+    row.querySelectorAll('input').forEach(function(inp){inp.addEventListener('input',calcPurTotal);});
+    row.querySelector('.pur-del').addEventListener('click',function(){row.remove();calcPurTotal();});
+  }
+  function calcPurTotal(){
+    var total=0;
+    document.querySelectorAll('#purRows .pur-row').forEach(function(row){
+      var q=parseFloat(row.querySelector('.pur-qty').value)||0;
+      var c=parseFloat(row.querySelector('.pur-cost').value)||0;
+      total+=q*c;
+    });
+    $('purTotal').textContent=fmt(total)+' ج.م';
+    return total;
+  }
+  $('addPurRow').addEventListener('click',addPurRow);
+  function setPurMode(m){purMode=m;$('purPaid').classList.toggle('active',m==='paid');$('purCredit').classList.toggle('active',m==='credit');}
+  $('purPaid').addEventListener('click',function(){setPurMode('paid');});
+  $('purCredit').addEventListener('click',function(){setPurMode('credit');});
+  $('savePurBtn').addEventListener('click',function(){
+    var sid=+$('purSupplier').value;
+    var supp=suppliers.find(function(x){return x.id===sid;});
+    if(!supp){alert('اختر المورد أولاً');return;}
+    var items=[];
+    document.querySelectorAll('#purRows .pur-row').forEach(function(row){
+      var name=row.querySelector('.pur-name').value.trim();
+      var q=parseFloat(row.querySelector('.pur-qty').value)||0;
+      var c=parseFloat(row.querySelector('.pur-cost').value)||0;
+      if(name && q>0){items.push({name:name,qty:q,cost:c});}
+    });
+    if(!items.length){alert('أضف صنفاً واحداً على الأقل بالكمية');return;}
+    var total=0;items.forEach(function(it){total+=it.qty*it.cost;});
+    var added=0;
+    items.forEach(function(it){var p=products.find(function(x){return x.name===it.name;});if(p){p.stock+=it.qty;added++;}});
+    saveP();
+    if(purMode==='credit'){supp.balance=(supp.balance||0)+total;saveV();}
+    purchases.unshift({id:Date.now(),date:new Date().toISOString(),supplierId:supp.id,supplierName:supp.name,items:items,total:total,status:purMode});
+    savePur();
+    $('purRows').innerHTML='';addPurRow();calcPurTotal();setPurMode('paid');
+    renderPurchases();renderGrid($('scanInput').value);
+    alert('تم حفظ فاتورة الشراء بقيمة '+fmt(total)+' ج.م — تم تحديث مخزون '+added+' أصناف'+(purMode==='credit'?' وأضيفت لمستحقات المورد':''));
+  });
+  function renderPurchases(){
+    var box=$('purchaseList');box.innerHTML='';
+    if(!purchases.length){box.innerHTML='<div style="text-align:center;color:var(--muted);padding:30px;"><i class="ri-shopping-basket-2-line" style="font-size:30px;display:block;margin-bottom:6px;"></i>لا توجد فواتير شراء مسجلة</div>';return;}
+    purchases.slice(0,80).forEach(function(p){
+      var names=p.items.map(function(i){return i.name+'×'+i.qty;}).join('، ');
+      var row=document.createElement('div');
+      row.style.cssText='border:1px solid var(--border);border-radius:12px;padding:10px 14px;background:var(--bg);';
+      row.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">'
+        +'<strong style="font-size:14px;"><i class="ri-truck-line" style="color:var(--slate);"></i> '+p.supplierName+'</strong>'
+        +(p.status==='credit'?'<span style="font-size:11px;font-weight:800;color:var(--warn);background:var(--warn-soft);padding:2px 8px;border-radius:20px;">آجلة</span>':'<span style="font-size:11px;font-weight:800;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:20px;">مدفوعة</span>')
+        +'</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">'+names+'</div>'
+        +'<div class="num" style="font-size:11px;color:var(--muted);margin-top:2px;">'+new Date(p.date).toLocaleString('ar-EG')+' | الإجمالي: <span style="color:var(--slate);font-weight:800;">'+fmt(p.total)+' ج.م</span></div>';
+      box.appendChild(row);
+    });
+  }
+  $('clearPurBtn').addEventListener('click',function(){if(confirmPin()&&confirm('تأكيد مسح سجل المشتريات؟ (لن يتراجع المخزون)')){purchases=[];savePur();renderPurchases();}});
+
+  $('exportBtn').addEventListener('click',function(){
+    var data={products:products,sales:sales,seq:seq,customers:customers,suppliers:suppliers,payments:payments,purchases:purchases,vouchers:vouchers,exportedAt:new Date().toISOString()};
+    var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    a.download='pos_backup_'+new Date().toISOString().slice(0,10)+'.json';
+    a.click();URL.revokeObjectURL(a.href);
+  });
+  $('importBtn').addEventListener('click',function(){$('importFile').click();});
+  $('importFile').addEventListener('change',function(e){
+    var file=e.target.files[0];if(!file)return;
+    var reader=new FileReader();
+    reader.onload=function(ev){
+      try{
+        var data=JSON.parse(ev.target.result);
+        if(!data.products)throw new Error('ملف غير صالح');
+        if(!confirm('سيتم استبدال البيانات الحالية بالنسخة المستعادة. متابعة؟'))return;
+        products=data.products;sales=data.sales||[];seq=data.seq||(products.length+1);
+        customers=data.customers||[];suppliers=data.suppliers||[];payments=data.payments||[];purchases=data.purchases||[];vouchers=data.vouchers||[];
+        saveP();saveS();saveQ();saveC();saveV();savePay();savePur();saveVou();
+        refreshCustomerDatalist();refreshSupplierSelect();refreshProductNames();
+        renderProductList();renderGrid('');renderHistory();renderCustomers();renderSuppliers();renderPurchases();
+        alert('تمت الاستعادة بنجاح');
+      }catch(err){alert('فشل قراءة الملف: '+err.message);}
+    };
+    reader.readAsText(file);e.target.value='';
+  });
+
+  function renderHistory(){
+    var today=new Date().toDateString(), tSum=0,tCnt=0,all=0;
+    validSales().forEach(function(s){all+=s.total;if(new Date(s.date).toDateString()===today){tSum+=s.total;tCnt++;}});
+    $('statToday').textContent=fmt(tSum)+' ج.م';$('statCount').textContent=tCnt;$('statAll').textContent=fmt(all)+' ج.م';
+    $('statRecv').textContent=fmt(totalReceivables())+' ج.م';
+    var dayFilter=$('histDate').value;
+    var box=$('historyList');box.innerHTML='';
+    var list=sales.slice(0,120);
+    if(dayFilter){list=list.filter(function(s){return new Date(s.date).toLocaleDateString('en-CA')===dayFilter;});
+      var daySum=0;validSales().forEach(function(s){if(new Date(s.date).toLocaleDateString('en-CA')===dayFilter)daySum+=s.total;});
+      $('histDayTotal').textContent='مبيعات هذا اليوم: '+fmt(daySum)+' ج.م';
+    }else{$('histDayTotal').textContent='';}
+    if(!list.length){box.innerHTML='<div style="text-align:center;color:var(--muted);padding:30px;">لا توجد مبيعات في هذه الفترة</div>';return;}
+    list.forEach(function(s){
+      var names=s.items.map(function(i){return i.name;}).join('، ');
+      var row=document.createElement('div');
+      row.style.cssText='display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid var(--border);flex-wrap:wrap;'+(s.returned?'opacity:.5;':'');
+      row.innerHTML='<div style="flex:1;min-width:180px;"><div style="font-size:13px;font-weight:700;">'+names+(s.returned?' <span style="color:var(--danger);font-size:11px;">(مرتجع)</span>':'')+'</div>'
+        +'<div class="num" style="font-size:11px;color:var(--muted);">'+new Date(s.date).toLocaleString('ar-EG')+' | العميل: '+(s.customer||'عميل نقدي')+' | '+(s.paymentType==='credit'?'<span style="color:var(--danger);font-weight:700;">آجل</span>':'<span style="color:var(--accent);font-weight:700;">نقدي</span>')+'</div></div>'
+        +'<span class="num" style="font-weight:800;color:var(--accent);font-size:15px;min-width:80px;text-align:left;">'+fmt(s.total)+' ج.م</span>'
+        +(s.returned?'':'<button data-return="'+s.id+'" class="btn-danger" style="padding:5px 9px;font-size:11px;"><i class="ri-arrow-go-back-line"></i> مرتجع</button>');
+      box.appendChild(row);
+    });
+    box.querySelectorAll('[data-return]').forEach(function(b){b.addEventListener('click',function(){
+      var s=sales.find(function(x){return x.id===+b.getAttribute('data-return');});if(!s)return;
+      if(!confirmPin())return;
+      if(!confirm('تأكيد مرتجع الفاتورة رقم '+s.id+'؟\nسيتم إرجاع الكميات للمخزون واستبعاد الفاتورة من التقارير.'))return;
+      s.items.forEach(function(it){var p=products.find(function(x){return x.name===it.name;});if(p){p.stock+=it.qty;}});
+      s.returned=true;
+      if(s.paymentType==='credit'){var c=customers.find(function(x){return x.name===s.customer;});if(c){c.balance=Math.max(0,(c.balance||0)-s.total);saveC();}}
+      saveP();saveS();window.dispatchEvent(new Event('jamica:sale'));renderHistory();renderGrid($('scanInput').value);
+      alert('تم تسجيل المرتجع وإرجاع المخزون');
+    });});
+  }
+  $('histDate').addEventListener('change',renderHistory);
+  $('clearHistDate').addEventListener('click',function(){$('histDate').value='';renderHistory();});
+  $('clearHistoryBtn').addEventListener('click',function(){if(confirmPin()&&confirm('تأكيد مسح كامل سجل المبيعات؟')){sales=[];saveS();renderHistory();}});
+
+  function buildReport(kind){
+    var dayVal=$('reportDate').value, monthVal=$('reportMonth').value;
+    var list=validSales(), label='';
+    if(kind==='day'){
+      if(!dayVal){alert('اختر اليوم أولاً');return;}
+      list=list.filter(function(s){return s.date.slice(0,10)===dayVal;});
+      label='يوم '+dayVal;
+    }else{
+      if(!monthVal){alert('اختر الشهر أولاً');return;}
+      list=list.filter(function(s){return s.date.slice(0,7)===monthVal;});
+      label='شهر '+monthVal;
+    }
+    var total=0,count=list.length;
+    var items={};
+    list.forEach(function(s){
+      total+=s.total;
+      s.items.forEach(function(it){if(!items[it.name])items[it.name]={qty:0,rev:0,unit:it.unit||'قطعة'};items[it.name].qty+=it.qty;items[it.name].rev+=it.qty*it.price;});
+    });
+    $('rPeriod').textContent=label;
+    $('rPrinted').textContent='تاريخ الطباعة: '+new Date().toLocaleString('ar-EG');
+    $('rRepTotal').textContent=fmt(total)+' ج.م';
+    $('rRepCount').textContent=count;
+    $('rRepAvg').textContent=count?fmt(total/count)+' ج.م':'0';
+    var tb=$('rRepItems');tb.innerHTML='';
+    Object.keys(items).sort().forEach(function(n){
+      var tr=document.createElement('tr');tr.style.borderBottom='1px solid #eee';
+      tr.innerHTML='<td style="padding:6px;">'+n+'</td><td class="num" style="padding:6px;text-align:center;">'+items[n].qty+' '+items[n].unit+'</td><td class="num" style="padding:6px;text-align:left;">'+fmt(items[n].rev)+'</td>';
+      tb.appendChild(tr);
+    });
+    if(!count){tb.innerHTML='<tr><td colspan="3" style="padding:15px;text-align:center;color:var(--muted);">لا توجد مبيعات في هذه الفترة</td></tr>';}
+    $('reportModal').style.display='flex';
+  }
+  $('btnDayReport').addEventListener('click',function(){buildReport('day');});
+  $('btnMonthReport').addEventListener('click',function(){buildReport('month');});
+  $('closeReportBtn').addEventListener('click',function(){$('reportModal').style.display='none';});
+  $('printReportBtn').addEventListener('click',function(){
+    document.body.classList.add('print-report');
+    window.print();
+    setTimeout(function(){document.body.classList.remove('print-report');},600);
+  });
+
+  // Vouchers
+  function refreshVoucherParties(){
+    var vc=$('vouCustomer');vc.innerHTML='';
+    customers.forEach(function(c){var o=document.createElement('option');o.value=c.id;o.textContent=c.name+' (مستحق '+fmt(c.balance||0)+' ج.م)';vc.appendChild(o);});
+    if(!customers.length){var o=document.createElement('option');o.value='';o.textContent='لا يوجد عملاء';vc.appendChild(o);}
+    var vs=$('vouSupplier');vs.innerHTML='';
+    suppliers.forEach(function(s){var o=document.createElement('option');o.value=s.id;o.textContent=s.name+' (له علينا '+fmt(s.balance||0)+' ج.م)';vs.appendChild(o);});
+    if(!suppliers.length){var o=document.createElement('option');o.value='';o.textContent='لا يوجد موردون';vs.appendChild(o);}
+  }
+  function syncVouType(){
+    var t=VOU_TYPES[$('vouType').value];
+    $('vouPartyCustWrap').style.display=t.party==='customer'?'':'none';
+    $('vouPartySuppWrap').style.display=t.party==='supplier'?'':'none';
+    $('vouPartyFreeWrap').style.display=t.party==='free'?'':'none';
+  }
+  function setVouDate(){$('vouDate').value=new Date().toISOString().slice(0,10);}
+  $('vouType').addEventListener('change',syncVouType);
+  $('vouForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    var type=$('vouType').value, cfg=VOU_TYPES[type];
+    var amount=parseFloat($('vouAmount').value);
+    if(!(amount>0)){alert('أدخل مبلغاً صحيحاً');return;}
+    var date=$('vouDate').value||new Date().toISOString().slice(0,10);
+    var party='', partyId=null;
+    if(cfg.party==='customer'){
+      partyId=+$('vouCustomer').value;
+      var c=customers.find(function(x){return x.id===partyId;});
+      party=c?c.name:'عميل';
+      if(c){c.balance=Math.max(0,(c.balance||0)-amount);saveC();payments.push({id:Date.now(),date:new Date().toISOString(),customerId:c.id,customerName:c.name,amount:amount});savePay();}
+    }else if(cfg.party==='supplier'){
+      partyId=+$('vouSupplier').value;
+      var s=suppliers.find(function(x){return x.id===partyId;});
+      party=s?s.name:'مورد';
+      if(s){s.balance=Math.max(0,(s.balance||0)-amount);saveV();}
+    }else{
+      party=$('vouParty').value.trim()||'—';
+    }
+    var notes=$('vouNotes').value.trim();
+    var v={id:Date.now(),type:type,label:cfg.label,dir:cfg.dir,party:party,partyId:partyId,amount:amount,notes:notes,date:date};
+    vouchers.unshift(v);saveVou();
+    this.reset();setVouDate();syncVouType();refreshVoucherParties();renderVouchers();
+    showVoucher(v);
+  });
+  function renderVouchers(){
+    var tin=0,tout=0;
+    vouchers.forEach(function(v){if(v.dir==='in')tin+=v.amount;else tout+=v.amount;});
+    $('vouInTotal').textContent=fmt(tin)+' ج.م';
+    $('vouOutTotal').textContent=fmt(tout)+' ج.م';
+    $('vouNetTotal').textContent=fmt(tin-tout)+' ج.م';
+    var box=$('voucherList');box.innerHTML='';
+    if(!vouchers.length){box.innerHTML='<div style="text-align:center;color:var(--muted);padding:30px;"><i class="ri-file-list-2-line" style="font-size:30px;display:block;margin-bottom:6px;"></i>لا توجد سندات مسجلة</div>';return;}
+    vouchers.slice(0,100).forEach(function(v){
+      var row=document.createElement('div');
+      row.style.cssText='border:1px solid var(--border);border-radius:12px;padding:10px 14px;background:var(--bg);display:flex;gap:10px;align-items:center;flex-wrap:wrap;';
+      var badge=v.dir==='in'?'<span style="font-size:11px;font-weight:800;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:20px;">قبض +</span>':'<span style="font-size:11px;font-weight:800;color:var(--danger);background:var(--danger-soft);padding:2px 8px;border-radius:20px;">دفع −</span>';
+      row.innerHTML='<div style="flex:1;min-width:180px;"><div style="font-weight:700;font-size:13px;">'+v.label+' '+badge+'</div>'
+        +'<div style="font-size:12px;color:var(--muted);margin-top:2px;">'+v.party+(v.notes?' — '+v.notes:'')+'</div>'
+        +'<div class="num" style="font-size:11px;color:var(--muted);margin-top:2px;">'+v.date+' | رقم: '+v.id+'</div></div>'
+        +'<span class="num" style="font-weight:800;font-size:15px;color:'+(v.dir==='in'?'var(--accent)':'var(--danger)')+';min-width:90px;text-align:left;">'+fmt(v.amount)+' ج.م</span>'
+        +'<div style="display:flex;gap:6px;"><button data-vprint="'+v.id+'" class="btn-ok" style="padding:5px 9px;font-size:11px;"><i class="ri-printer-line"></i> طباعة</button>'
+        +'<button data-vdel="'+v.id+'" class="btn-warn" style="padding:5px 9px;font-size:11px;"><i class="ri-delete-bin-line"></i></button></div>';
+      box.appendChild(row);
+    });
+    box.querySelectorAll('[data-vprint]').forEach(function(b){b.addEventListener('click',function(){
+      var v=vouchers.find(function(x){return x.id===+b.getAttribute('data-vprint');});if(v)showVoucher(v);
+    });});
+    box.querySelectorAll('[data-vdel]').forEach(function(b){b.addEventListener('click',function(){
+      if(confirmPin()&&confirm('تأكيد حذف السند؟ (لن يتراجع رصيد العميل/المورد)')){
+        vouchers=vouchers.filter(function(x){return x.id!==+b.getAttribute('data-vdel');});saveVou();renderVouchers();
+      }
+    });});
+  }
+  $('clearVouBtn').addEventListener('click',function(){if(confirmPin()&&confirm('تأكيد مسح كامل سجل السندات؟')){vouchers=[];saveVou();renderVouchers();}});
+  function showVoucher(v){
+    $('vTitle').textContent=v.label;
+    $('vMeta').textContent='سند رقم: '+v.id;
+    $('vDate').textContent=v.date;
+    $('vPartyLabel').textContent=v.dir==='in'?'استلمنا من:':'دفعنا إلى:';
+    $('vParty').textContent=v.party;
+    $('vAmount').textContent=fmt(v.amount)+' ج.م';
+    $('vAmount').style.color=v.dir==='in'?'var(--accent)':'var(--danger)';
+    $('vNotes').textContent=v.notes||'—';
+    $('voucherModal').style.display='flex';
+  }
+  $('closeVoucherBtn').addEventListener('click',function(){$('voucherModal').style.display='none';});
+  $('printVoucherBtn').addEventListener('click',function(){
+    document.body.classList.add('print-voucher');
+    window.print();
+    setTimeout(function(){document.body.classList.remove('print-voucher');},600);
+  });
+  setVouDate();syncVouType();
+
+  $('savePinBtn').addEventListener('click',function(){
+    var old=prompt('لتغيير الكود أدخل الكود الحالي:');
+    if(old!==pin){alert('الكود الحالي خاطئ');return;}
+    var nw=$('pinInput').value.trim();
+    if(!nw){alert('أدخل كوداً جديداً');return;}
+    pin=nw;localStorage.setItem(LS_PIN,pin);$('pinInput').value='';
+    alert('تم تغيير كود الحذف بنجاح');
+  });
+  $('todayLine').textContent='تاريخ اليوم: '+new Date().toLocaleDateString('ar-EG',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+  load();
+  refreshCustomerDatalist();
+  refreshSupplierSelect();
+  refreshProductNames();
+  fillNewBarcode();
+  addPurRow();
+  renderGrid('');
+  renderCart();
+  $('scanInput').focus();
+})();
+</script>
+<script>
+/* Non-invasive enhancements: all original business operations remain unchanged. */
+(function(){'use strict';
+const $=id=>document.getElementById(id);
+const keys={products:'pos_products_v1',sales:'pos_sales_v1',customers:'pos_customers_v1',suppliers:'pos_suppliers_v1',purchases:'pos_purchases_v1',payments:'pos_payments_v1',vouchers:'pos_vouchers_v1',seq:'pos_seq_v1'};
+const read=k=>{try{let v=JSON.parse(localStorage.getItem(k));return Array.isArray(v)?v:[]}catch(e){return []}};
+const money=n=>(Number(n)||0).toLocaleString('ar-EG',{maximumFractionDigits:2})+' ج.م';
+function notify(t){const e=$('upToast');e.textContent=t;e.style.display='block';clearTimeout(window._upT);window._upT=setTimeout(()=>e.style.display='none',3500)}
+function refresh(){let p=read(keys.products),s=read(keys.sales),day=new Date().toDateString();let today=s.filter(x=>{if(x.returned)return false;const d=new Date(x.date||x.createdAt||x.timestamp);return !Number.isNaN(d.getTime())&&d.toDateString()===day});$('upProducts').textContent=p.length;$('upLow').textContent=p.filter(x=>Number(x.stock)<=5).length;$('upToday').textContent=money(today.reduce((a,x)=>a+Number(x.total||x.grandTotal||0),0))}
+function download(name,content,type){let blob=new Blob([content],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500)}
+$('upTheme').onclick=()=>{let dark=document.body.classList.toggle('up-dark');localStorage.setItem('jamica_pos_dark',dark?'1':'0');notify(dark?'تم تشغيل الوضع الليلي':'تم تشغيل الوضع النهاري')};
+if(localStorage.getItem('jamica_pos_dark')==='1')document.body.classList.add('up-dark');
+$('upBackup').onclick=()=>{try{let data={app:'Jamica POS',version:2,exportedAt:new Date().toISOString(),storage:{}};for(let i=0;i<localStorage.length;i++){let k=localStorage.key(i);if(k.startsWith('pos_'))data.storage[k]=localStorage.getItem(k)}download('jamica-pos-backup-'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(data,null,2),'application/json');notify('تم تجهيز النسخة الاحتياطية؛ احتفظ بها في مكان آمن')}catch(e){notify('تعذر إنشاء النسخة: '+e.message)}};
+$('upCSV').onclick=()=>{let rows=read(keys.sales),headers=['رقم','التاريخ','العميل','الإجمالي','طريقة الدفع','مرتجع'];let vals=rows.map(x=>[x.id||'',x.date||x.createdAt||'',x.customer||x.customerName||'',x.total||x.grandTotal||0,x.paymentMethod||x.payMode||'',x.returned?'نعم':'لا']);let esc=v=>'"'+String(v??'').replace(/"/g,'""')+'"';download('jamica-sales-'+new Date().toISOString().slice(0,10)+'.csv','\ufeff'+[headers,...vals].map(row=>row.map(esc).join(',')).join('\r\n'),'text/csv;charset=utf-8');notify('تم تجهيز تقرير المبيعات')};
+$('upHelp').onclick=()=>alert('اختصارات الكاشير:\nF2: البحث والباركود\nF4: الأصناف\nF6: العملاء\nF8: المبيعات/التقارير\nCtrl + S: نسخة احتياطية\nEsc: إغلاق النوافذ المفتوحة');
+document.addEventListener('keydown',e=>{if(e.ctrlKey&&e.key.toLowerCase()==='s'){e.preventDefault();$('upBackup').click();return}if(e.altKey||e.ctrlKey||e.metaKey)return;let tab={F4:'products',F6:'customers',F8:'history'}[e.key];if(e.key==='F2'){e.preventDefault();document.querySelector('[data-tab="sale"]')?.click();$('scanInput')?.focus();return}if(tab){e.preventDefault();document.querySelector('[data-tab="'+tab+'"]')?.click()}if(e.key==='Escape')document.querySelectorAll('[id$="Modal"]').forEach(x=>{if(x.style.display==='flex')x.style.display='none'})});
+window.addEventListener('storage',refresh);document.addEventListener('click',()=>setTimeout(refresh,100));document.addEventListener('submit',()=>setTimeout(refresh,150));refresh();setInterval(refresh,30000);
+})();
+</script>
+<script id="pro3script">
+(()=>{'use strict';
+const $=id=>document.getElementById(id),K={p:'pos_products_v1',s:'pos_sales_v1',c:'pos_customers_v1',v:'pos_suppliers_v1',pur:'pos_purchases_v1',vou:'pos_vouchers_v1',extra:'jamica_pro3_expenses',audit:'jamica_pro3_audit'};
+const read=(k,f=[])=>{try{const x=JSON.parse(localStorage.getItem(k));return Array.isArray(x)?x:f}catch{return f}};
+const write=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){alert('تعذر الحفظ؛ تأكد من مساحة التخزين: '+e.message);return false}};
+const money=n=>(Number(n)||0).toLocaleString('ar-EG',{minimumFractionDigits:2,maximumFractionDigits:2})+' ج.م';
+const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const day=x=>{const d=new Date(x);return Number.isNaN(d.getTime())?'':`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+const inRange=x=>{const d=day(x);return d&&d>=($('proFrom').value||'0000')&&d<=($('proTo').value||'9999')};
+const download=(name,data,type)=>{const u=URL.createObjectURL(new Blob([data],{type})),a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),2000)};
+const types={expense:'مصروف تشغيل',withdrawal:'مسحوبات شخصية',income:'إيراد آخر'};
+function metrics(){const p=read(K.p),sales=read(K.s).filter(x=>!x.returned&&inRange(x.date)),purchases=read(K.pur).filter(x=>inRange(x.date)),vouchers=read(K.vou).filter(x=>inRange(x.date)),extras=read(K.extra).filter(x=>inRange(x.date));
+const revenue=sales.reduce((a,x)=>a+(+x.total||0),0),cost=sales.reduce((a,x)=>a+(x.items||[]).reduce((b,it)=>{const prod=p.find(z=>z.name===it.name);return b+(Number(it.qty)||0)*(Number(it.cost??prod?.costPrice)||0)},0),0),expenses=extras.filter(x=>x.type==='expense').reduce((a,x)=>a+x.amount,0)+vouchers.filter(x=>['exp_general','exp_petty'].includes(x.type)).reduce((a,x)=>a+(+x.amount||0),0),withdrawals=extras.filter(x=>x.type==='withdrawal').reduce((a,x)=>a+x.amount,0),other=extras.filter(x=>x.type==='income').reduce((a,x)=>a+x.amount,0);
+const values=[['إجمالي المبيعات',money(revenue)],['تكلفة البضاعة المباعة (تقديري)',money(cost)],['مجمل الربح (تقديري)',money(revenue-cost)],['مصروفات التشغيل المسجلة',money(expenses)],['صافي تشغيلي تقديري',money(revenue-cost-expenses+other)],['مسحوبات شخصية',money(withdrawals)],['مشتريات الفترة',money(purchases.reduce((a,x)=>a+(+x.total||0),0))],['مستحقات العملاء الحالية',money(read(K.c).reduce((a,x)=>a+(+x.balance||0),0))],['مستحقات الموردين الحالية',money(read(K.v).reduce((a,x)=>a+(+x.balance||0),0))],['قيمة المخزون بالتكلفة',money(p.reduce((a,x)=>a+(+x.stock||0)*(+x.costPrice||0),0))],['أصناف منخفضة المخزون',p.filter(x=>(+x.stock||0)<= (+$('proThreshold').value||0)).length],['عدد فواتير البيع',sales.length]];
+$('proMetrics').innerHTML=values.map(([label,value])=>`<div class="metric"><small>${label}</small><b>${value}</b></div>`).join('');}
+function stock(){const term=$('proSearch').value.trim().toLowerCase(),p=read(K.p).filter(x=>String(x.name+' '+x.barcode).toLowerCase().includes(term));$('proStock').innerHTML=p.slice(0,250).map(x=>`<tr><td>${esc(x.name)}<div class="muted">${esc(x.barcode)}</div></td><td>${esc(x.stock)}</td><td>${money(x.price)}</td><td>${money(x.costPrice)}</td><td><button data-cost="${esc(x.id)}">التكلفة</button> <button data-stock="${esc(x.id)}">جرد</button></td></tr>`).join('')||'<tr><td colspan="5">لا توجد أصناف مطابقة</td></tr>';}
+function expense(){const data=read(K.extra);$('proExpenses').innerHTML=data.slice(0,80).map(x=>`<tr><td>${esc(day(x.date))}</td><td>${esc(types[x.type])}</td><td>${money(x.amount)}</td><td>${esc(x.note)}</td><td><button data-del="${esc(x.id)}">حذف</button></td></tr>`).join('')||'<tr><td colspan="5">لا توجد حركات</td></tr>';}
+function audit(){ $('proMovements').innerHTML=read(K.audit).slice(0,80).map(x=>`<tr><td>${esc(day(x.date))}</td><td>${esc(x.name)}</td><td>${esc(x.before)}</td><td>${esc(x.after)}</td><td>${esc(x.reason)}</td></tr>`).join('')||'<tr><td colspan="5">لا توجد حركات جرد</td></tr>';}
+function refresh(){metrics();stock();expense();audit()}
+$('pro3Tab').onclick=()=>{const panel=$('pro3');panel.hidden=!panel.hidden;document.querySelectorAll('#tabs .tab-btn').forEach(x=>x.classList.remove('active'));if(!panel.hidden){$('pro3Tab').classList.add('active');document.querySelectorAll('main > section[id^="tab-"]').forEach(x=>x.style.display='none');refresh();panel.scrollIntoView({behavior:'smooth'})}else document.querySelector('[data-tab="sale"]')?.click()};
+document.querySelectorAll('#tabs [data-tab]').forEach(x=>x.addEventListener('click',()=>{$('pro3').hidden=true;$('pro3Tab').classList.remove('active')}));
+$('proRefresh').onclick=refresh;$('proSearchBtn').onclick=stock;$('proSearch').oninput=stock;$('proThreshold').oninput=metrics;
+$('proStock').onclick=e=>{const b=e.target.closest('button');if(!b)return;const id=b.dataset.cost??b.dataset.stock,p=read(K.p),x=p.find(z=>String(z.id)===id);if(!x)return;if(b.dataset.cost!==undefined){const val=prompt('سعر تكلفة الصنف بالجنيه (غير سعر البيع):',x.costPrice??0);if(val===null)return;const n=Number(val);if(!Number.isFinite(n)||n<0){alert('أدخل تكلفة صحيحة');return}x.costPrice=n;if(write(K.p,p))refresh();return}
+const val=prompt('الكمية الفعلية بعد الجرد:',x.stock);if(val===null)return;const n=Number(val);if(!Number.isFinite(n)||n<0||!Number.isInteger(n)){alert('أدخل كمية صحيحة غير سالبة');return}const reason=prompt('سبب تعديل المخزون (إجباري):');if(!reason?.trim())return;if(!confirm(`تغيير مخزون ${x.name} من ${x.stock} إلى ${n}؟`))return;const before=x.stock;x.stock=n;if(write(K.p,p)){const a=read(K.audit);a.unshift({id:Date.now(),date:new Date().toISOString(),name:x.name,before,after:n,reason:reason.trim()});write(K.audit,a);refresh();alert('تم تسجيل الجرد. حدّث صفحة الكاشير لعرض الكميات الجديدة في جميع الأقسام.')}};
+$('proExpenseForm').onsubmit=e=>{e.preventDefault();const amount=Number($('proExpenseAmount').value),note=$('proExpenseNote').value.trim();if(!Number.isFinite(amount)||amount<=0||!note)return;const a=read(K.extra);a.unshift({id:Date.now()+'-'+Math.random().toString(36).slice(2),date:new Date().toISOString(),type:$('proExpenseType').value,amount,note});if(write(K.extra,a)){e.target.reset();refresh()}};
+$('proExpenses').onclick=e=>{const id=e.target.closest('button')?.dataset.del;if(!id||!confirm('حذف هذه الحركة المالية؟'))return;write(K.extra,read(K.extra).filter(x=>String(x.id)!==id));refresh()};
+$('proFullBackup').onclick=()=>{const storage={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k.startsWith('pos_')||k.startsWith('jamica_'))storage[k]=localStorage.getItem(k)}download('jamica-pos-full-'+day(new Date())+'.json',JSON.stringify({app:'Jamica POS Pro',schema:3,exportedAt:new Date().toISOString(),storage},null,2),'application/json')};
+$('proRestore').onclick=()=>$('proFile').click();$('proFile').onchange=async e=>{const f=e.target.files?.[0];if(!f)return;try{if(f.size>20*1024*1024)throw Error('الملف كبير جدًا');const obj=JSON.parse(await f.text());if(!obj||typeof obj.storage!=='object'||Array.isArray(obj.storage))throw Error('صيغة النسخة غير صحيحة');const entries=Object.entries(obj.storage);if(!entries.length||entries.some(([k,v])=>!(k.startsWith('pos_')||k.startsWith('jamica_'))||typeof v!=='string'))throw Error('النسخة تحتوي مفاتيح غير مدعومة');if(!confirm('سيتم استبدال البيانات الحالية ببيانات النسخة. خذ نسخة احتياطية أولًا. متابعة؟'))return;const snapshot={};entries.forEach(([k])=>snapshot[k]=localStorage.getItem(k));try{entries.forEach(([k,v])=>localStorage.setItem(k,v))}catch(err){Object.entries(snapshot).forEach(([k,v])=>{if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v)});throw err}alert('تمت الاستعادة. ستُعاد تحميل الصفحة الآن.');location.reload()}catch(err){alert('فشلت الاستعادة: '+err.message)}finally{e.target.value=''}};
+$('proExport').onclick=()=>{const rows=[['التاريخ','رقم الفاتورة','العميل','الإجمالي','نوع الدفع'],...read(K.s).filter(x=>inRange(x.date)).map(x=>[day(x.date),x.id,x.customer,x.total,x.paymentType])];const cell=v=>'"'+String(v??'').replace(/^[=+@\-\t\r]/,'\'$&').replace(/"/g,'""')+'"';download('jamica-report-'+day(new Date())+'.csv','\ufeff'+rows.map(r=>r.map(cell).join(',')).join('\r\n'),'text/csv;charset=utf-8')};
+$('proFrom').value=day(new Date(new Date().getFullYear(),new Date().getMonth(),1));$('proTo').value=day(new Date());refresh();
+})();
+</script>
+
+<section id="megaPanel" hidden dir="rtl" style="max-width:1200px;margin:18px auto;padding:18px;background:var(--card);border:1px solid var(--border);border-radius:18px">
+<style>
+#megaPanel[hidden]{display:none!important}#megaPanel .mg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}#megaPanel .mg-card{padding:15px;border:1px solid var(--border);border-radius:14px;background:var(--bg)}#megaPanel input,#megaPanel select{padding:9px;border:1px solid var(--border);border-radius:9px;max-width:100%;width:100%;background:var(--card);color:var(--text)}#megaPanel button{padding:9px 12px;border-radius:9px;border:1px solid var(--border);background:var(--accent-soft);color:var(--text);cursor:pointer;font-weight:700}#megaPanel label{display:block;font-size:12px;margin:8px 0 3px}#megaPanel table{width:100%;border-collapse:collapse;font-size:12px}#megaPanel th,#megaPanel td{padding:8px;border-bottom:1px solid var(--border);text-align:right}#megaPanel .mg-scroll{overflow:auto;max-height:310px}#megaPanel h3{margin:0 0 12px}#megaPanel .mg-note{font-size:12px;color:var(--muted);line-height:1.8}
+</style>
+<h2>⚙️ مركز الإدارة المتقدمة — مكتبة الجبري</h2>
+<p class="mg-note">البيانات محفوظة محليًا في نفس المتصفح. الأرباح تقديرية عند غياب تكلفة الشراء التاريخية. الصلاحيات المحلية لا توفر حماية من شخص يستطيع الوصول لملفات الجهاز.</p>
+<div class="mg-grid" id="mgStats"></div>
+<div class="mg-grid" style="margin-top:15px">
+<div class="mg-card"><h3>🏦 خزنة وتقفيل وردية</h3><label>رصيد افتتاحي</label><input id="mgOpening" type="number" min="0" step=".01" value="0"><label>النقدية الفعلية عند التقفيل</label><input id="mgActual" type="number" min="0" step=".01"><button id="mgClose">تقفيل وردية اليوم</button><p class="mg-note" id="mgCashResult"></p></div>
+<div class="mg-card"><h3>📦 مخزون المكتبة والمخزن</h3><label>الصنف</label><select id="mgProduct"></select><label>الكمية المنقولة</label><input id="mgQty" type="number" min="1" step="1" value="1"><label>اتجاه التحويل</label><select id="mgDirection"><option value="toWarehouse">من المكتبة إلى المخزن</option><option value="toShop">من المخزن إلى المكتبة</option></select><button id="mgTransfer">تنفيذ تحويل</button><p class="mg-note">الكميات القديمة تُعتبر في المكتبة مبدئيًا؛ لا يتغير إجمالي المخزون بالتحويل.</p></div>
+<div class="mg-card"><h3>📦 وحدات البيع</h3><label>عدد القطع في العلبة</label><input id="mgBox" type="number" min="1" step="1" value="12"><label>عدد القطع في الكرتونة</label><input id="mgCarton" type="number" min="1" step="1" value="144"><label>سعر العلبة</label><input id="mgBoxPrice" type="number" min="0" step=".01"><label>سعر الكرتونة</label><input id="mgCartonPrice" type="number" min="0" step=".01"><button id="mgUnitsSave">حفظ وحدات الصنف المختار</button><p class="mg-note">وحدات البيع تُحفظ كإعدادات للصنف، دون تغيير طريقة البيع الأصلية. يلزم تكامل إضافي لتطبيقها تلقائيًا داخل سلة الكاشير.</p></div>
+<div class="mg-card"><h3>🔐 الموظفون والسجل</h3><label>اسم الموظف الحالي</label><input id="mgUser" placeholder="اسم الموظف"><button id="mgSetUser">تحديد المستخدم</button><p class="mg-note">سجل محلي للمراجعة وليس نظام تسجيل دخول آمنًا. عمليات الإدارة الحساسة تتطلب كود المدير الأصلي حيثما أمكن.</p><button id="mgBackup">تحميل نسخة احتياطية كاملة</button><button id="mgCheck">فحص سلامة البيانات</button><p class="mg-note" id="mgCheckResult"></p></div>
+</div>
+<div class="mg-card" style="margin-top:14px"><h3>🧾 الفواتير والمرتجعات</h3><input id="mgSearch" placeholder="بحث برقم الفاتورة أو العميل أو التاريخ"><div class="mg-scroll"><table><thead><tr><th>الرقم</th><th>التاريخ</th><th>العميل</th><th>الإجمالي</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody id="mgInvoices"></tbody></table></div><p class="mg-note">إعادة الطباعة تستخدم إيصال البرنامج الأصلي. المرتجع الكامل يتم من تبويب التقارير الأصلي للحفاظ على منطق إعادة المخزون والديون.</p></div>
+<div class="mg-grid" style="margin-top:14px"><div class="mg-card"><h3>📋 سجل العمليات</h3><div class="mg-scroll"><table><tbody id="mgAudit"></tbody></table></div></div><div class="mg-card"><h3>📅 الورديات السابقة</h3><div class="mg-scroll"><table><tbody id="mgShifts"></tbody></table></div></div></div>
+</section>
+
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id), keys={p:'pos_products_v1',s:'pos_sales_v1',v:'pos_vouchers_v1',pur:'pos_purchases_v1',extras:'jamica_pro3_expenses',warehouse:'jamica_pro8_warehouse',units:'jamica_pro8_units',audit:'jamica_pro8_log',shifts:'jamica_pro8_shifts',user:'jamica_pro8_user'};
+const read=(k)=>{try{const v=JSON.parse(localStorage.getItem(k));return Array.isArray(v)?v:[]}catch{return []}},put=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){alert('تعذر الحفظ: '+e.message);return false}},date=d=>{const x=new Date(d);return Number.isNaN(+x)?'':`${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`},today=()=>date(new Date()),money=n=>(Number(n)||0).toFixed(2)+' ج.م',esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const log=(action,detail)=>{const a=read(keys.audit);a.unshift({at:new Date().toISOString(),user:localStorage.getItem(keys.user)||'غير محدد',action,detail});put(keys.audit,a.slice(0,2000))};
+const manager=()=>{const pin=localStorage.getItem('pos_delete_pin_v1')||localStorage.getItem('pos_pin_v1')||'1234';const input=prompt('أدخل كود المدير الأصلي لإجراء التعديل:');return input!==null&&input===pin};
+const stock=()=>read(keys.p),sales=()=>read(keys.s),todaySales=()=>sales().filter(x=>!x.returned&&date(x.date)===today()),salesSum=arr=>arr.reduce((a,x)=>a+(Number(x.total)||0),0);
+function refresh(){const p=stock(),ss=todaySales(),all=sales().filter(x=>!x.returned),cost=all.reduce((a,s)=>a+(s.items||[]).reduce((b,i)=>{const pr=p.find(z=>z.name===i.name);return b+(+i.qty||0)*(+i.cost||+pr?.costPrice||0)},0),0),wh=read(keys.warehouse),units=read(keys.units);
+$('mgStats').innerHTML=[['مبيعات اليوم',money(salesSum(ss))],['فواتير اليوم',ss.length],['مبيعات مسجلة',money(salesSum(all))],['ربح إجمالي تقديري',money(salesSum(all)-cost)],['إجمالي الأصناف',p.length],['أصناف منخفضة ≤5',p.filter(x=>+x.stock<=5).length],['المخزن',wh.reduce((a,x)=>a+(+x.qty||0),0)+' قطعة'],['أصناف بوحدات إضافية',units.length]].map(([a,b])=>`<div class="mg-card"><div class="mg-note">${a}</div><strong>${b}</strong></div>`).join('');
+const selected=$('mgProduct').value;$('mgProduct').innerHTML=p.map(x=>`<option value="${esc(x.id)}">${esc(x.name)}</option>`).join('');if(p.some(x=>String(x.id)===selected))$('mgProduct').value=selected;showUnits();renderInvoices();renderAudit();renderShifts();}
+function showUnits(){const u=read(keys.units).find(x=>String(x.id)===$('mgProduct').value)||{};$('mgBox').value=u.box||12;$('mgCarton').value=u.carton||144;$('mgBoxPrice').value=u.boxPrice??'';$('mgCartonPrice').value=u.cartonPrice??''}
+function renderInvoices(){const q=$('mgSearch').value.trim().toLowerCase();$('mgInvoices').innerHTML=sales().filter(x=>[x.id,x.customer,date(x.date)].join(' ').toLowerCase().includes(q)).slice(0,250).map(x=>`<tr><td>${esc(x.id)}</td><td>${esc(date(x.date))}</td><td>${esc(x.customer)}</td><td>${money(x.total)}</td><td>${x.returned?'مرتجع':'مكتملة'}</td><td><button data-invoice="${esc(x.id)}">عرض وطباعة</button></td></tr>`).join('')||'<tr><td colspan="6">لا توجد فواتير</td></tr>'}
+function renderAudit(){$('mgAudit').innerHTML=read(keys.audit).slice(0,100).map(x=>`<tr><td>${esc(new Date(x.at).toLocaleString('ar-EG'))}</td><td>${esc(x.user)}</td><td>${esc(x.action)}</td><td>${esc(x.detail)}</td></tr>`).join('')||'<tr><td>لا توجد عمليات بعد</td></tr>'}
+function renderShifts(){$('mgShifts').innerHTML=read(keys.shifts).slice(0,50).map(x=>`<tr><td>${esc(x.date)}</td><td>المتوقع ${money(x.expected)}</td><td>الفعلي ${money(x.actual)}</td><td>الفرق ${money(x.diff)}</td></tr>`).join('')||'<tr><td>لا توجد ورديات مقفلة</td></tr>'}
+$('megaTab').onclick=()=>{document.querySelectorAll('main > section[id^="tab-"]').forEach(x=>x.style.display='none');if($('pro3'))$('pro3').hidden=true;document.querySelectorAll('#tabs .tab-btn').forEach(x=>x.classList.remove('active'));$('megaTab').classList.add('active');$('megaPanel').hidden=false;refresh();$('megaPanel').scrollIntoView()};document.querySelectorAll('#tabs [data-tab],#pro3Tab').forEach(b=>b?.addEventListener('click',()=>{$('megaPanel').hidden=true;$('megaTab').classList.remove('active')}));
+$('mgProduct').onchange=showUnits;$('mgSearch').oninput=renderInvoices;
+$('mgTransfer').onclick=()=>{if(!manager())return alert('كود المدير غير صحيح');const p=stock(),x=p.find(z=>String(z.id)===$('mgProduct').value),n=Number($('mgQty').value),w=read(keys.warehouse),rec=w.find(z=>String(z.id)===String(x?.id));if(!x||!Number.isSafeInteger(n)||n<=0)return alert('كمية غير صحيحة');const inWarehouse=rec?.qty||0;const toWarehouse=$('mgDirection').value==='toWarehouse';if((toWarehouse?x.stock:inWarehouse)<n)return alert('الكمية غير كافية');if(!confirm('تأكيد تحويل '+n+' من '+x.name+'؟'))return;
+// Store the full before-image to permit rollback on quota failure.
+const oldP=localStorage.getItem(keys.p),oldW=localStorage.getItem(keys.warehouse);if(toWarehouse)x.stock-=n;else x.stock+=n;if(rec)rec.qty+=toWarehouse?n:-n;else w.push({id:x.id,qty:n});try{localStorage.setItem(keys.p,JSON.stringify(p));localStorage.setItem(keys.warehouse,JSON.stringify(w))}catch(e){if(oldP===null)localStorage.removeItem(keys.p);else localStorage.setItem(keys.p,oldP);if(oldW===null)localStorage.removeItem(keys.warehouse);else localStorage.setItem(keys.warehouse,oldW);return alert('تعذر التحويل: '+e.message)}log('تحويل مخزون',`${x.name}: ${n} ${toWarehouse?'إلى المخزن':'إلى المكتبة'}`);refresh();alert('تم التحويل. أعد تحميل الصفحة لتحديث مخزون شاشة البيع')};
+$('mgUnitsSave').onclick=()=>{if(!manager())return alert('كود المدير غير صحيح');const id=$('mgProduct').value,box=+$('mgBox').value,carton=+$('mgCarton').value,bp=+$('mgBoxPrice').value,cp=+$('mgCartonPrice').value;if(!id||![box,carton].every(x=>Number.isSafeInteger(x)&&x>0)||![bp,cp].every(x=>Number.isFinite(x)&&x>=0))return alert('راجع القيم');const a=read(keys.units).filter(x=>String(x.id)!==id);a.push({id,box,carton,boxPrice:bp,cartonPrice:cp});if(put(keys.units,a)){log('تعديل وحدات',id);refresh()}};
+$('mgSetUser').onclick=()=>{const v=$('mgUser').value.trim();if(!v)return;localStorage.setItem(keys.user,v);log('تحديد مستخدم',v);refresh()};$('mgUser').value=localStorage.getItem(keys.user)||'';
+$('mgClose').onclick=()=>{if(!manager())return alert('كود المدير غير صحيح');const opening=+$('mgOpening').value,actual=+$('mgActual').value;if(![opening,actual].every(x=>Number.isFinite(x)&&x>=0))return alert('أدخل رصيدًا صحيحًا');const d=today(),cash=todaySales().filter(x=>x.paymentType!=='credit').reduce((a,x)=>a+(+x.total||0),0),expenses=read(keys.extras).filter(x=>date(x.date)===d&&['expense','withdrawal'].includes(x.type)).reduce((a,x)=>a+(+x.amount||0),0),expected=opening+cash-expenses,diff=actual-expected;if(!confirm(`المتوقع ${money(expected)}، الفعلي ${money(actual)}، الفرق ${money(diff)}. تأكيد؟`))return;const a=read(keys.shifts);a.unshift({id:Date.now(),date:d,at:new Date().toISOString(),opening,cash,expenses,expected,actual,diff});if(put(keys.shifts,a)){log('تقفيل وردية',`فرق ${diff}`);$('mgCashResult').textContent=`تم التقفيل، الفرق ${money(diff)}. النقدية تقديرية ولا تشمل كل سندات الدفع والتحصيل.`;refresh()}};
+$('mgInvoices').onclick=e=>{const id=e.target.closest('[data-invoice]')?.dataset.invoice;if(!id)return;const x=sales().find(s=>String(s.id)===id);if(!x)return;const receipt=$('receiptArea');if(!receipt)return alert('الإيصال غير متاح');const rows=(x.items||[]).map(i=>`${esc(i.name)} × ${esc(i.qty)} = ${money((+i.qty||0)*(+i.price||0))}`).join('\n');const popup=window.open('','_blank','width=430,height=650');if(!popup)return alert('اسمح بالنوافذ المنبثقة للطباعة');popup.document.write('<!doctype html><html dir="rtl" lang="ar"><meta charset="utf-8"><title>فاتورة '+esc(x.id)+'</title><style>body{font-family:Arial;padding:20px;white-space:pre-line}</style><body><h2>مكتبة الجبري</h2>فاتورة '+esc(x.id)+'\n'+esc(new Date(x.date).toLocaleString('ar-EG'))+'\nالعميل: '+esc(x.customer)+'\n'+rows+'\nالإجمالي: '+money(x.total)+'<p><button onclick="print()">طباعة</button></p></body></html>');popup.document.close()};
+$('mgBackup').onclick=()=>{const storage={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k.startsWith('pos_')||k.startsWith('jamica_'))storage[k]=localStorage.getItem(k)}const blob=new Blob([JSON.stringify({app:'Jamica POS Pro',schema:8,exportedAt:new Date().toISOString(),storage},null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='jamica-pos-full-v8-'+today()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);log('نسخة احتياطية','تصدير ملف')};
+$('mgCheck').onclick=()=>{const p=stock(),s=sales(),ids=new Set(),dups=[];for(const x of s){if(ids.has(String(x.id)))dups.push(x.id);ids.add(String(x.id))}const invalid=p.filter(x=>!Number.isFinite(+x.stock)||+x.stock<0||!Number.isFinite(+x.price)||+x.price<0),todayTotal=salesSum(todaySales());$('mgCheckResult').textContent=`الفواتير: ${s.length}، مبيعات اليوم: ${money(todayTotal)}، أرقام فواتير مكررة: ${dups.length}، أصناف غير سليمة: ${invalid.length}. ${dups.length||invalid.length?'راجع البيانات قبل البيع.':'فحص البنية الأساسي ناجح.'}`};
+window.addEventListener('jamica:sale',refresh);window.addEventListener('storage',refresh);refresh();
+})();
+</script>
+<style>
+#cloudPanel{margin:16px auto;max-width:1200px;padding:18px;background:var(--card);border:1px solid var(--border);border-radius:16px}#cloudPanel input{padding:9px;border:1px solid var(--border);border-radius:8px;min-width:180px;max-width:100%}#cloudPanel button{padding:9px 13px;border-radius:9px;border:1px solid var(--border);cursor:pointer;background:var(--accent);color:white}#cloudPanel .cloudRow{display:flex;gap:9px;flex-wrap:wrap;margin:10px 0}#cloudStatus{font-weight:bold;white-space:pre-wrap}#managerCloud{overflow:auto}#managerCloud table{border-collapse:collapse;width:100%}#managerCloud td,#managerCloud th{padding:9px;border-bottom:1px solid var(--border);text-align:right}
+</style>
+<section id="cloudPanel" dir="rtl"><h2>☁️ Jamica POS — الربط السحابي</h2><p>بيانات البيع تظل محليًا أثناء انقطاع الإنترنت. رفع النسخة ومراجعة تقارير المدير يتطلبان تسجيل الدخول. <b>لا تفتح النظام من ملف file:// للربط السحابي؛ استخدم استضافة HTTPS.</b></p>
+<div class="cloudRow"><input id="cloudUrl" placeholder="Supabase Project URL" aria-label="رابط المشروع"><input id="cloudKey" placeholder="Supabase publishable / anon key" aria-label="المفتاح العام"><button id="cloudConfig">حفظ الاتصال</button></div>
+<div class="cloudRow"><input id="cloudEmail" type="email" placeholder="البريد الإلكتروني"><input id="cloudPassword" type="password" placeholder="كلمة المرور"><button id="cloudLogin">دخول</button><button id="cloudLogout">خروج</button></div>
+<div id="cloudStatus" role="status">غير متصل</div>
+<div class="cloudRow"><button id="cloudUpload">رفع البيانات المحلية للسحابة</button><button id="cloudFetch">جلب نسخة سحابية (مع تأكيد)</button><button id="cloudReport">تقرير المدير من السحابة</button></div>
+<p style="font-size:12px">لا يتم دمج بيانات جهازين تلقائيًا. عند وجود تعديل أحدث على السحابة، يُرفض الرفع لحماية البيانات. احتفظ بنسخة احتياطية قبل استعادة أي نسخة سحابية.</p><div id="managerCloud"></div></section>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id), allowed=k=>k.startsWith('pos_')||k.startsWith('jamica_'), esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let client=null,revision=null,role=null,baseline=null;
+const status=s=>{$('cloudStatus').textContent=s};
+$('cloudUrl').value=localStorage.getItem('jamica_cloud_url')||'';
+$('cloudKey').value=localStorage.getItem('jamica_cloud_public_key')||'';
+function connect(){let url=$('cloudUrl').value.trim(),key=$('cloudKey').value.trim();if(!/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(url))throw Error('أدخل رابط مشروع Supabase الصحيح');if(!key)throw Error('المفتاح العام مطلوب');if(!window.supabase)throw Error('تعذر تحميل مكتبة Supabase؛ تأكد من الإنترنت');client=window.supabase.createClient(url,key,{auth:{persistSession:true,autoRefreshToken:true}});return client}
+$('cloudConfig').onclick=()=>{try{connect();localStorage.setItem('jamica_cloud_url',$('cloudUrl').value.trim());localStorage.setItem('jamica_cloud_public_key',$('cloudKey').value.trim());status('تم حفظ إعدادات الاتصال. سجّل الدخول.')}catch(e){status(e.message)}};
+async function current(){if(!client)connect();const {data:{user},error}=await client.auth.getUser();if(error||!user)throw Error('سجّل الدخول أولًا');const res=await client.from('pos_members').select('role').eq('user_id',user.id).single();if(res.error||!res.data)throw Error('الحساب ليس ضمن فريق الكاشير');role=res.data.role;return user}
+$('cloudLogin').onclick=async()=>{try{if(!client)connect();let {error}=await client.auth.signInWithPassword({email:$('cloudEmail').value.trim(),password:$('cloudPassword').value});if(error)throw error;let u=await current();status('متصل: '+u.email+' — '+role+'؛ اضغط جلب حالة السحابة قبل أول رفع.')}catch(e){status('فشل الدخول: '+e.message)}};
+$('cloudLogout').onclick=async()=>{if(client)await client.auth.signOut();revision=null;baseline=null;role=null;status('تم تسجيل الخروج')};
+async function remote(){await current();const {data,error}=await client.from('pos_state').select('revision,payload,updated_at').eq('id',1).single();if(error)throw error;return data}
+function localSnapshot(){const storage={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(allowed(k)&&!k.startsWith('jamica_cloud_')&&k!=='pos_pin_v1'&&k!=='pos_delete_pin_v1')storage[k]=localStorage.getItem(k)}return {format:'jamica-pos-v8',storage}}
+function downloadSnapshot(s){const b=new Blob([JSON.stringify({app:'Jamica POS cloud safety backup',exportedAt:new Date().toISOString(),storage:s.storage},null,2)],{type:'application/json'}),a=document.createElement('a'),u=URL.createObjectURL(b);a.href=u;a.download='jamica-before-cloud-'+Date.now()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),10000)}
+$('cloudFetch').onclick=async()=>{try{const r=await remote();if(!r.payload?.storage||!Object.keys(r.payload.storage).length){revision=r.revision;baseline=JSON.stringify(localSnapshot());return status('السحابة فارغة؛ تم قراءة المراجعة '+revision+'، يمكنك رفع بيانات الجهاز الأول الآن.')}const keys=Object.keys(r.payload.storage);if(keys.some(k=>!allowed(k)||typeof r.payload.storage[k]!=='string'||k.startsWith('jamica_cloud_')))throw Error('بيانات سحابية غير صالحة');if(!confirm('سيتم استبدال بيانات الكاشير المحلية بنسخة السحابة. سيتم تنزيل نسخة أمان أولًا. متابعة؟'))return;downloadSnapshot(localSnapshot());for(const k of keys)localStorage.setItem(k,r.payload.storage[k]);revision=r.revision;status('تم الاسترجاع؛ سيتم تحديث الصفحة');setTimeout(()=>location.reload(),900)}catch(e){status('فشل الجلب: '+e.message)}};
+$('cloudUpload').onclick=async()=>{try{const r=await remote();const snapshot=localSnapshot();if(r.revision!==revision){if(r.revision===0&&!Object.keys(r.payload?.storage||{}).length){revision=0}else{throw Error('توجد نسخة سحابية أحدث أو لم تُحمّل مراجعتها. لا يمكن الكتابة فوقها. افتح تقرير المدير أو راجع السحابة أولًا.')}}if(!confirm('رفع نسخة الجهاز الحالية إلى السحابة؟ لا تستخدم أكثر من جهاز كاشير في نفس الوقت.'))return;const {data,error}=await client.rpc('pos_commit',{expected_revision:revision,new_payload:snapshot});if(error)throw error;revision=data;baseline=JSON.stringify(snapshot);status('تم رفع البيانات بنجاح — المراجعة '+revision)}catch(e){status('لم يتم الرفع: '+e.message)}};
+const arr=(s,k)=>{try{const a=JSON.parse(s?.storage?.[k]||'[]');return Array.isArray(a)?a:[]}catch{return []}};
+const day=d=>{const x=new Date(d);return isNaN(x)?'':`${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`};
+$('cloudReport').onclick=async()=>{try{await current();if(role!=='manager')throw Error('التقرير متاح لحساب المدير فقط');const r=await remote();revision=r.revision;const s=r.payload, sales=arr(s,'pos_sales_v1'),products=arr(s,'pos_products_v1'),customers=arr(s,'pos_customers_v1'),suppliers=arr(s,'pos_suppliers_v1');const today=day(new Date());const total=a=>a.reduce((sum,x)=>sum+(Number(x.total??x.grandTotal)||0),0);const daily=sales.filter(x=>!x.returned&&day(x.date||x.createdAt||x.timestamp)===today);const money=x=>x.toLocaleString('ar-EG',{maximumFractionDigits:2})+' ج.م';let html='<h3>تقرير سحابي — آخر تحديث: '+esc(r.updated_at)+'</h3><table><tr><th>المؤشر</th><th>القيمة</th></tr>';for(const [k,v] of [['مبيعات اليوم',money(total(daily))],['عدد فواتير اليوم',daily.length],['عدد جميع الفواتير',sales.length],['عدد الأصناف',products.length],['عملاء',customers.length],['موردون',suppliers.length],['إجمالي المبيعات المسجلة',money(total(sales.filter(x=>!x.returned)))]])html+='<tr><td>'+esc(k)+'</td><td>'+esc(v)+'</td></tr>';html+='</table><p>التقرير يعكس آخر رفع للسحابة، وليس العمليات المحلية غير المرفوعة.</p>';$('managerCloud').innerHTML=html;status('تم تحميل التقرير من السحابة — مراجعة '+revision)}catch(e){status('تعذر التقرير: '+e.message)}};
+try{if($('cloudUrl').value&&$('cloudKey').value)connect()}catch(e){status(e.message)}
+})();
+</script>
+</body>
+</html>
